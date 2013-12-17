@@ -197,13 +197,80 @@ public class RESTCall
     }
 
     /**
+     * Sets the HTTP method for this REST call.
+     * 
+     * @param httpMethod
+     *            The HTTP method used in the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @see com.gargoylesoftware.htmlunit.HttpMethod
+     */
+    public RESTCall setHttpMethod( HttpMethod httpMethod )
+    {
+        this.httpMethod = httpMethod;
+        return this;
+    }
+
+    /**
      * Returns the configured HTTP method for this REST call, e.g. POST or GET.
      * 
      * @return The configured HTTP method for this REST call.
+     * 
+     * @see com.gargoylesoftware.htmlunit.HttpMethod
      */
     public final HttpMethod getHttpMethod()
     {
         return this.httpMethod;
+    }
+
+    /**
+     * Adds/updates a HTTP header to the REST call configuration. Since HTTP
+     * headers must be unique the new header replaces an already existing one
+     * with the same name.
+     * 
+     * @param name
+     *            The name of the HTTP header, e.g. <b>Content-type</b>.
+     * @param value
+     *            The value of the HTTP header, e.g. <b>application/json</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addHttpHeader( String name, String value )
+    {
+        this.httpHeaders.put( name, value );
+        return this;
+    }
+
+    /**
+     * Adds/updates several HTTP headers to the REST call configuration. Since
+     * HTTP headers must be unique the new headers replace already existing ones
+     * with the same name.
+     * 
+     * @param httpHeaders
+     *            A map of HTTP headers. The key element in the map should be
+     *            the name of the header, the value element should be its value.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addAllHttpHeaders( Map<String, String> httpHeaders )
+    {
+        this.httpHeaders.putAll( httpHeaders );
+        return this;
+    }
+
+    /**
+     * Returns the value of the HTTP header with the given name.
+     * 
+     * @param name
+     *            The name of the HTTP header, e.g. <b>Content-type</b>.
+     * 
+     * @return The value of the HTTP header with the given name. If no value was
+     *         found <b>null</b> is returned.
+     */
+    public final String getHttpHeader( String name )
+    {
+        return this.httpHeaders.get( name );
     }
 
     /**
@@ -218,17 +285,47 @@ public class RESTCall
     }
 
     /**
-     * Sets the response of this REST call. When performing the configured REST
-     * call ( {@link #process() }) the REST response is set automatically.
+     * Removes a HTTP header from the REST call configuration by its name.
      * 
-     * @param response
-     *            The response of the REST call.
+     * @param name
+     *            The name of the HTTP header, e.g. <b>Content-type</b>.
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall setRESTResponse( WebResponse response )
+    public RESTCall removeHttpHeader( String name )
     {
-        this.response = response;
+        this.httpHeaders.remove( name );
+        return this;
+    }
+
+    /**
+     * Removes several HTTP headers from the REST call configuration by their
+     * names.
+     * 
+     * @param names
+     *            An array of names of the HTTP headers, e.g.
+     *            <b>Content-type</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeHttpHeaders( String... names )
+    {
+        // Loop through all names of the array and remove the corresponding
+        // headers from the map.
+        for ( String name : names )
+            this.httpHeaders.remove( name );
+
+        return this;
+    }
+
+    /**
+     * Removes all HTTP headers from the REST call configuration.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeAllHttpHeaders()
+    {
+        this.httpHeaders = new HashMap<String, String>();
         return this;
     }
 
@@ -344,6 +441,21 @@ public class RESTCall
         return process();
     }
 
+    /**
+     * Sets the response of this REST call. When performing the configured REST
+     * call ( {@link #process() }) the REST response is set automatically.
+     * 
+     * @param response
+     *            The response of the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setRESTResponse( WebResponse response )
+    {
+        this.response = response;
+        return this;
+    }
+
     /****************************************************************************************
      ************************ Private Methods ***********************************************
      ****************************************************************************************/
@@ -353,7 +465,7 @@ public class RESTCall
      */
     private final void readGlobalSettings()
     {
-
+        // TODO Implement global settings.
     }
 
     /**
