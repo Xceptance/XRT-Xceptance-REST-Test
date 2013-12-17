@@ -124,7 +124,8 @@ public class RESTCall
      * the Url into the internal representation. It assumes that the last path
      * element is the identifier for the resource.
      * 
-     * @param url The Url used for the REST call.
+     * @param url
+     *            The Url used for the REST call.
      */
     public RESTCall( final String url )
     {
@@ -228,10 +229,10 @@ public class RESTCall
             this.port = def.port();
 
         if ( !def.basePath().isEmpty() )
-            this.basePath = def.basePath();
+            this.basePath = sanitizeUrlPathSegment( def.basePath() );
 
         if ( !def.resourcePath().isEmpty() )
-            this.resourcePath = def.resourcePath();
+            this.resourcePath = sanitizeUrlPathSegment( def.resourcePath() );
 
         if ( def.queryParams().length != 0 )
         {
@@ -257,7 +258,13 @@ public class RESTCall
      */
     private final void readHttpMethodDefinition( final Class<?> resourceDef )
     {
+        HttpMethodDefinition def = resourceDef.getAnnotation( HttpMethodDefinition.class );
 
+        // If there is no annotation stop processing.
+        if ( def == null )
+            return;
+
+        this.httpMethod = def.value();
     }
 
     /**
@@ -269,7 +276,18 @@ public class RESTCall
      */
     private final void readHttpHeaderDefinition( final Class<?> resourceDef )
     {
+        HttpHeaderDefinition def = resourceDef.getAnnotation( HttpHeaderDefinition.class );
 
+        // If there is no annotation stop processing.
+        if ( def == null )
+            return;
+
+        // Loop through all headers of the definition and add them to the HTTP
+        // header map.
+        for ( HttpHeader header : def.value() )
+        {
+            this.httpHeaders.put( header.name(), header.value() );
+        }
     }
 
     /**
@@ -409,7 +427,7 @@ public class RESTCall
         // Replace double slashes with single slashes until only single slashes
         // exist.
         while ( url.contains( "//" ) )
-            url = url.replace( "//", "/" );
+            url = url.replaceAll( "//", "/" );
 
         return url;
     }
@@ -428,7 +446,7 @@ public class RESTCall
         // Replace double fragment separators with single slashes until only
         // single slashes exist.
         while ( url.contains( "##" ) )
-            url = url.replace( "##", "#" );
+            url = url.replaceAll( "##", "#" );
 
         return url;
     }
@@ -447,15 +465,18 @@ public class RESTCall
         // Replace double query param separators with single slashes until only
         // single slashes exist.
         while ( url.contains( "??" ) )
-            url = url.replace( "??", "?" );
+            url = url.replaceAll( "\\?\\?", "?" );
 
         return url;
     }
 
     /**
-     * Splits the query string of an Url into its individual parameters and adds them to the query parameter map.
+     * Splits the query string of an Url into its individual parameters and adds
+     * them to the query parameter map.
      * 
-     * @param queryString The part of the Url after '?' and before '#'. Should already be Url encoded.
+     * @param queryString
+     *            The part of the Url after '?' and before '#'. Should already
+     *            be Url encoded.
      */
     private final void splitQueryString( final String queryString )
     {
@@ -472,5 +493,31 @@ public class RESTCall
                 this.queryParams.put( keyValue.substring( 0, index ), keyValue.substring( index + 1 ) );
             }
         }
+    }
+
+    /**
+     * All Url path segments like {@link #basePath} or {@link #resourcePath} are
+     * saved without leading and trailing slashes. Also double slashes should be
+     * replaced by single ones.
+     * 
+     * @param urlPathSegment
+     *            A part of the url path.
+     * 
+     * @return The sanitized Url path segment.
+     */
+    private String sanitizeUrlPathSegment( final String urlPathSegment )
+    {
+        // Remove double slashes.
+        String sanitizedUrl = removeMultipleSlashes( urlPathSegment );
+
+        // Remove a potential leading slash.
+        if ( sanitizedUrl.startsWith( "/" ) )
+            sanitizedUrl = sanitizedUrl.substring( 1 );
+
+        // Remove a potential trailing slash.
+        if ( sanitizedUrl.endsWith( "/" ) )
+            sanitizedUrl = sanitizedUrl.substring( 0, sanitizedUrl.length() - 1 );
+
+        return sanitizedUrl;
     }
 }

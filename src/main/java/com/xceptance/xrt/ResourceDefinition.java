@@ -8,11 +8,19 @@ import java.lang.annotation.Target;
 import com.xceptance.xrt.QueryParameter;
 
 /**
- * <p>Annotation that defines the default Url to call a REST resource. The following example shows which settings can be done to create a REST URL:</p><br/>
+ * <p>
+ * Annotation that defines the default Url to call a REST resource. The
+ * following example shows which settings can be done to create a REST URL:
+ * </p>
+ * <br/>
+ * 
  * <pre>
- * {baseUrl}/{basePath}/{resourcePath}?{queryParam1}&{queryParam2}#{fragment} 
+ * {baseUrl}/{basePath}/{resourcePath}?{queryParam1}&{queryParam2}#{fragment}
  * </pre>
- * <p>A concrete example could look like this:</p>
+ * <p>
+ * A concrete example could look like this:
+ * </p>
+ * 
  * <pre>
  * https://valid.host.com:433/base/path/resource?foo=bar&foo2=bar2#fragment
  * </pre>
@@ -77,7 +85,8 @@ public @interface ResourceDefinition
 
     /**
      * The default value for the part of URL path between the host name and the
-     * resource path.
+     * resource path. Leading and trailing slashes are not necessary. Here is an
+     * example: <b>base/path</b>.
      * 
      * @return The default Url base path of the REST resource.
      */
@@ -85,7 +94,7 @@ public @interface ResourceDefinition
 
     /**
      * The default value for the part of the URL path that refers to the REST
-     * resource.
+     * resource. A leading slash is not necessary.
      * 
      * @return The default resource path of the REST resource.
      */
@@ -100,7 +109,8 @@ public @interface ResourceDefinition
 
     /**
      * The default URL fragment. It is the optional element at the end of an URL
-     * that is added by appending a '#' sign followed by the fragment.
+     * that is added by appending a '#' sign followed by the fragment. A leading
+     * '#' character is not necessary.
      * 
      * @return The default URL fragment of the rest resource.
      */
