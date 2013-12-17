@@ -26,17 +26,17 @@ public class RESTCall
     /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
-    String protocol = "";
+    private String protocol = "";
 
     /**
      * The port used in the REST call, e.g. <b>80</b> and <b>433</b>.
      */
-    int port = -1;
+    private int port = -1;
 
     /**
      * The host name used in the REST call, e.g. <b>xceptance.com</b>.
      */
-    String hostName = "";
+    private String hostName = "";
 
     /**
      * The base path used in the REST call. The base path is the part of the Url
@@ -44,39 +44,39 @@ public class RESTCall
      * <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b>
      * is the base path in the Url.
      */
-    String basePath = "";
+    private String basePath = "";
 
     /**
      * Identifies the resource of the REST call.
      */
-    String resourcePath = "";
+    private String resourcePath = "";
 
     /**
      * A map of query parameters that are used in the REST call, e.g.
      * <b>xceptance.com/base/path/resource?paramName=paramValue</b>.
      */
-    Map<String, String> queryParams = new HashMap<String, String>();
+    private Map<String, String> queryParams = new HashMap<String, String>();
 
     /**
      * The fragment used in the REST call, e.g.
      * <b>xceptance.com/base/path/resource?paramName=paramValue#fragment</b>.
      */
-    String fragment = "";
+    private String fragment = "";
 
     /**
      * The HTTP method used in the REST call, e.g. GET and POST.
      */
-    HttpMethod httpMethod;
+    private HttpMethod httpMethod;
 
     /**
      * A map of http headers.
      */
-    Map<String, String> httpHeaders = new HashMap<String, String>();
+    private Map<String, String> httpHeaders = new HashMap<String, String>();
 
     /**
      * The response of the REST call.
      */
-    WebResponse response;
+    private WebResponse response;
 
     /****************************************************************************************
      ************************ Constructors **************************************************
