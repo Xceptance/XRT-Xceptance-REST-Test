@@ -1,8 +1,13 @@
 package com.xceptance.xrt;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import com.gargoylesoftware.htmlunit.HttpMethod;
 
 /**
  * <p>
@@ -120,7 +125,7 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ", "https://my.url.test.com", call.getUrl() );
     }
-    
+
     /**
      * Calls the constructor that takes a class with definition annotations as
      * an argument. The class defines the base Url only via the resource
@@ -139,17 +144,18 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
     }
-    
+
     /**
      * Calls the constructor that takes a class with definition annotations as
-     * an argument. The class defines the base Url and the base path via the resource
-     * definition. The base path has a leading and a trailing '/' character.
+     * an argument. The class defines the base Url and the base path via the
+     * resource definition. The base path has a leading and a trailing '/'
+     * character.
      */
     @Test
     public void resourceDefinition_basePathWithLeadingAndTrailingSlash()
     {
         // Define the resource definition
-        @ResourceDefinition( baseUrl = "my.url.test.com", basePath="/base///path/" )
+        @ResourceDefinition( baseUrl = "my.url.test.com", basePath = "/base///path/" )
         class DefinitionClass
         {
         }
@@ -158,17 +164,18 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ", "my.url.test.com/base/path", call.getUrl() );
     }
-    
+
     /**
      * Calls the constructor that takes a class with definition annotations as
-     * an argument. The class defines the base Url and the base path via the resource
-     * definition. The base path has a leading and a trailing '/' character.
+     * an argument. The class defines the base Url and the base path via the
+     * resource definition. The base path has a leading and a trailing '/'
+     * character.
      */
     @Test
     public void resourceDefinition_resourcePathWithLeadingAndTrailingSlash()
     {
         // Define the resource definition
-        @ResourceDefinition( baseUrl = "my.url.test.com", resourcePath="/resource/" )
+        @ResourceDefinition( baseUrl = "my.url.test.com", resourcePath = "/resource/" )
         class DefinitionClass
         {
         }
@@ -176,5 +183,50 @@ public class TestRESTCallDefinitionSetup
         RESTCall call = new RESTCall( DefinitionClass.class );
 
         Assert.assertEquals( "Expected Url: ", "my.url.test.com/resource", call.getUrl() );
+    }
+
+    /**
+     * Calls the constructor that takes a class with definition annotations as
+     * an argument. The class defines the base Url and the base path via the
+     * resource definition. The base path has a leading and a trailing '/'
+     * character.
+     */
+    @Test
+    public void httpMethodDefinition()
+    {
+        // Define the resource definition
+        @HttpMethodDefinition( HttpMethod.POST )
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall( DefinitionClass.class );
+
+        Assert.assertEquals( "Expected Http Method: ", HttpMethod.POST, call.getHttpMethod() );
+    }
+
+    /**
+     * Calls the constructor that takes a class with definition annotations as
+     * an argument. The class defines the base Url and the base path via the
+     * resource definition. The base path has a leading and a trailing '/'
+     * character.
+     */
+    @Test
+    public void httpHeaderDefinition()
+    {
+        // Define the resource definition
+        @HttpHeaderDefinition( { @HttpHeader( name = "Content-type", value = "application/json" ),
+                @HttpHeader( name = "x-custom", value = "true" ) } )
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall( DefinitionClass.class );
+
+        Map<String,String> expectedMap = new HashMap<String,String>();
+        expectedMap.put( "Content-type", "application/json" );
+        expectedMap.put( "x-custom", "true" );
+        
+        Assert.assertEquals( "Expected Http Headers: ", expectedMap, call.getHttpHeaders() );
     }
 }
