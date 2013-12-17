@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.WebResponse;
 
 /**
  * Performs a REST call based on the information retrieved from its internal and
@@ -71,6 +72,11 @@ public class RESTCall
      * A map of http headers.
      */
     Map<String, String> httpHeaders = new HashMap<String, String>();
+
+    /**
+     * The response of the REST call.
+     */
+    WebResponse response;
 
     /****************************************************************************************
      ************************ Constructors **************************************************
@@ -145,7 +151,7 @@ public class RESTCall
      * @return The Url ready to call. Returns <b>null</b> if the host name is
      *         missing.
      */
-    public String getUrl()
+    public final String getUrl()
     {
         // String builder that builds the Url.
         StringBuilder builder = new StringBuilder();
@@ -188,6 +194,154 @@ public class RESTCall
             builder.append( "#" ).append( this.fragment );
 
         return builder.toString();
+    }
+
+    /**
+     * Returns the configured HTTP method for this REST call, e.g. POST or GET.
+     * 
+     * @return The configured HTTP method for this REST call.
+     */
+    public final HttpMethod getHttpMethod()
+    {
+        return this.httpMethod;
+    }
+
+    /**
+     * Returns a map of the configured HTTP headers for this REST call, e.g.
+     * Content-type:application/json.
+     * 
+     * @return A map of the configured HTTP headers for this REST call.
+     */
+    public final Map<String, String> getHttpHeaders()
+    {
+        return this.httpHeaders;
+    }
+
+    /**
+     * Sets the response of this REST call. When performing the configured REST
+     * call ( {@link #process() }) the REST response is set automatically.
+     * 
+     * @param response
+     *            The response of the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setRESTResponse( WebResponse response )
+    {
+        this.response = response;
+        return this;
+    }
+
+    /**
+     * Makes the call using the configured Url ( {@link #getUrl()} ), the HTTP
+     * headers, and the HTTP method.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall process() throws Throwable
+    {
+        new XltRESTAction( this ).run();
+        return this;
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with GET and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall get() throws Throwable
+    {
+        this.httpMethod = HttpMethod.GET;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with POST and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall post() throws Throwable
+    {
+        this.httpMethod = HttpMethod.POST;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with PUT and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall put() throws Throwable
+    {
+        this.httpMethod = HttpMethod.PUT;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with DELETE and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall delete() throws Throwable
+    {
+        this.httpMethod = HttpMethod.DELETE;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with HEAD and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall head() throws Throwable
+    {
+        this.httpMethod = HttpMethod.HEAD;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with OPTIONS and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall options() throws Throwable
+    {
+        this.httpMethod = HttpMethod.OPTIONS;
+        return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with TRACE and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall trace() throws Throwable
+    {
+        this.httpMethod = HttpMethod.TRACE;
+        return process();
     }
 
     /****************************************************************************************
