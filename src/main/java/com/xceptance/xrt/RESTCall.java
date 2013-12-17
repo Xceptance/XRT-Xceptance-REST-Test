@@ -8,14 +8,25 @@ import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
 
 /**
+ * <p>
  * Performs a REST call based on the information retrieved from its internal and
  * global settings.
+ * </p>
+ * <br/>
+ * <p>
+ * All writing methods return the updated instance to ensure an efficient
+ * configuration of the REST call.
+ * </p>
+ * <br/>
  * 
  * @author Patrick Thaele
  * 
  */
 public class RESTCall
 {
+    // TODO Url encoding
+    // TODO Add placeholder management
+
     /****************************************************************************************
      ************************ Private Properties ********************************************
      ****************************************************************************************/
@@ -143,6 +154,342 @@ public class RESTCall
     /****************************************************************************************
      ************************ Public Methods ************************************************
      ****************************************************************************************/
+
+    /**
+     * Sets the protocol of this REST call, e.g. <b>http</b>. It's not necessary
+     * to set the protocol separator <b>://</b> because it is added
+     * automatically when creating the Url.
+     * 
+     * @param protocol
+     *            The new protocol of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setProtocol( final String protocol )
+    {
+        // Do nothing if the protocol is null.
+        if ( protocol != null )
+        {
+            this.protocol = protocol;
+
+            // Remove the protocol separator
+            this.protocol = this.protocol.replaceAll( "/", "" );
+            this.protocol = this.protocol.replaceAll( ":", "" );
+        }
+
+        return this;
+    }
+
+    /**
+     * Returns the protocol of the REST call configuration, e.g. <b>http</b>.
+     * 
+     * @return The protocol of the REST call configuration.
+     */
+    public final String getProtocol()
+    {
+        return this.protocol;
+    }
+
+    /**
+     * Sets the port of this REST call, e.g. <b>80</b>.
+     * 
+     * @param port
+     *            The new port of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setPort( final int port )
+    {
+        // Do nothing if the port is negative or 0.
+        if ( port > 0 )
+            this.port = port;
+
+        return this;
+    }
+
+    /**
+     * Returns the port of the REST call configuration, e.g. <b>80</b>.
+     * 
+     * @return The port of the REST call configuration.
+     */
+    public final int getPort()
+    {
+        return this.port;
+    }
+
+    /**
+     * Sets the host name of this REST call, e.g. <b>xceptance.com</b>.
+     * 
+     * @param hostName
+     *            The new host name of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setHostName( final String hostName )
+    {
+        // Do nothing if the host name is null.
+        if ( hostName != null )
+            this.hostName = hostName;
+
+        return this;
+    }
+
+    /**
+     * Returns the host name of the REST call configuration, e.g.
+     * <b>xceptance.com</b>.
+     * 
+     * @return The host name of the REST call configuration.
+     */
+    public final String getHostName()
+    {
+        return this.hostName;
+    }
+
+    /**
+     * Sets the base path of this REST call. The base path is the part of the
+     * Url between host name and resource path, e.g.
+     * <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b>
+     * is the base path in the Url.
+     * 
+     * @param basePath
+     *            The new base path of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setBasePath( final String basePath )
+    {
+        // Do nothing if the base path is null.
+        if ( basePath != null )
+            this.basePath = sanitizeUrlPathSegment( basePath );
+
+        return this;
+    }
+
+    /**
+     * Returns the base path of the REST call configuration, e.g.
+     * <b>base/path</b>.
+     * 
+     * @return The base path of the REST call configuration.
+     */
+    public final String getBasePath()
+    {
+        return this.basePath;
+    }
+
+    /**
+     * Sets the resource path of this REST call. The resource path is the part
+     * of the Url after the base path, e.g.
+     * <b>xceptance.com/base/path/resource/subresource</b>. In the example
+     * <b>resource/subresource</b> is the resource path in the Url.
+     * 
+     * @param resourcePath
+     *            The new resource path of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setResourcePath( final String resourcePath )
+    {
+        // Do nothing if the resource path is null.
+        if ( resourcePath != null )
+            this.resourcePath = sanitizeUrlPathSegment( resourcePath );
+
+        return this;
+    }
+
+    /**
+     * Returns the resource path of the REST call configuration, e.g.
+     * <b>resource/subresource</b>.
+     * 
+     * @return The resource path of the REST call configuration.
+     */
+    public final String getResourcePath()
+    {
+        return resourcePath;
+    }
+
+    /**
+     * Adds/updates a query parameter to the REST call configuration. Since
+     * query parameters must be unique the new parameter replaces an already
+     * existing one with the same name.
+     * 
+     * @param name
+     *            The name of the query parameter, e.g. <b>color</b>.
+     * @param value
+     *            The value of the query parameter, e.g. <b>red</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addQueryParam( String name, String value )
+    {
+        this.queryParams.put( name, value );
+        return this;
+    }
+
+    /**
+     * Adds/updates several query parameters to the REST call configuration.
+     * Since query parameters must be unique the new parameters replace already
+     * existing ones with the same name.
+     * 
+     * @param queryParams
+     *            A map of query parameters. The key element in the map should
+     *            be the name of the parameter, the value element should be its
+     *            value.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addAllQueryParams( Map<String, String> queryParams )
+    {
+        this.queryParams.putAll( queryParams );
+        return this;
+    }
+
+    /**
+     * Returns the value of the query parameter with the given name.
+     * 
+     * @param name
+     *            The name of the query parameter, e.g. <b>color</b>.
+     * 
+     * @return The value of the query parameter with the given name. If no value
+     *         was found <b>null</b> is returned.
+     */
+    public final String getQueryParam( String name )
+    {
+        return this.queryParams.get( name );
+    }
+
+    /**
+     * Returns a map of the configured query parameters for this REST call, e.g.
+     * <b>...?color=red</b>.
+     * 
+     * @return A map of the configured query parameters for this REST call.
+     */
+    public final Map<String, String> getQueryParams()
+    {
+        return this.queryParams;
+    }
+
+    /**
+     * Removes a query parameter from the REST call configuration by its name.
+     * 
+     * @param name
+     *            The name of the query parameter, e.g. <b>color</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeQueryParam( String name )
+    {
+        this.queryParams.remove( name );
+        return this;
+    }
+
+    /**
+     * Removes several query parameters from the REST call configuration by
+     * their names.
+     * 
+     * @param names
+     *            An array of names of the query parameters, e.g. <b>color</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeQueryParams( String... names )
+    {
+        // Loop through all names of the array and remove the corresponding
+        // parameters from the map.
+        for ( String name : names )
+            this.queryParams.remove( name );
+
+        return this;
+    }
+
+    /**
+     * Removes all query parameters from the REST call configuration.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeAllQueryParams()
+    {
+        this.queryParams = new HashMap<String, String>();
+        return this;
+    }
+
+    /**
+     * Sets the fragment of this REST call. It is added to the end of the Url
+     * separated from the rest by the '#' sign.
+     * 
+     * @param fragment
+     *            The new fragment of this REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setFragment( final String fragment )
+    {
+        // Do nothing if the fragmant is null.
+        if ( fragment != null )
+            this.fragment = fragment;
+
+        return this;
+    }
+
+    /**
+     * Returns the fragment of the REST call configuration.
+     * 
+     * @return The fragment of the REST call configuration.
+     */
+    public final String getFragment()
+    {
+        return this.fragment;
+    }
+
+    /**
+     * <p>
+     * Method that takes a resource definition as an argument. The resource
+     * definition overrides global settings but can be adjusted by public
+     * setters.
+     * </p>
+     * <br/>
+     * <p>
+     * A resource definition can be any class that uses any of the following
+     * definition annotations:
+     * </p>
+     * <ul>
+     * <li>{@link ResourceDefinition}</li>
+     * <li>{@link HttpMethodDefinition}</li>
+     * <li>{@link HttpHeaderDefinition}</li>
+     * </ul>
+     * <br/>
+     * 
+     * @param resourceDef
+     *            The class that provides default values for a REST resource.
+     */
+    public RESTCall setDefinitionClass( final Class<?> resourceDef )
+    {
+        // Do nothing if the class is null
+        if( resourceDef != null )
+        {
+            readResourceDefinition( resourceDef );
+            readHttpMethodDefinition( resourceDef );
+            readHttpHeaderDefinition( resourceDef );
+        }
+        
+        return this;
+    }
+    
+    /**
+     * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map
+     * the Url into the internal representation. It assumes that the last path
+     * element is the identifier for the resource.
+     * 
+     * @param url
+     *            The Url used for the REST call.
+     */
+    public RESTCall setUrl( final String url )
+    {
+        // Do nothing if the Url is null.
+        if ( url != null )
+            splitUrl( url );
+
+        return this;
+    }
 
     /**
      * Creates the REST Url. All elements are Url encoded. The host name is
@@ -489,7 +836,13 @@ public class RESTCall
             splitUrl( def.baseUrl() );
 
         if ( !def.protocol().isEmpty() )
+        {
             this.protocol = def.protocol();
+
+            // Remove the protocol separator
+            this.protocol = this.protocol.replaceAll( "/", "" );
+            this.protocol = this.protocol.replaceAll( ":", "" );
+        }
 
         if ( def.port() >= 0 )
             this.port = def.port();

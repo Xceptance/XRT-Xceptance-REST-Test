@@ -125,6 +125,25 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ", "https://my.url.test.com", call.getUrl() );
     }
+    
+    /**
+     * Calls the constructor that takes a class with definition annotations as
+     * an argument. The class defines a protocol with the separator <b>http://</b> via the resource
+     * definition.
+     */
+    @Test
+    public void resourceDefinition_protocolWithSeparator()
+    {
+        // Define the resource definition
+        @ResourceDefinition( baseUrl = "my.url.test.com", protocol="https://" )
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall( DefinitionClass.class );
+
+        Assert.assertEquals( "Expected Url: ", "https://my.url.test.com", call.getUrl() );
+    }
 
     /**
      * Calls the constructor that takes a class with definition annotations as
