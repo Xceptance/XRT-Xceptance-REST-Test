@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.xceptance.xrt.document.JSON;
 
 /**
  * <p>
@@ -37,12 +38,12 @@ public class RESTCall
     /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
-    private String protocol = "";
+    private String protocol = "http";
 
     /**
      * The port used in the REST call, e.g. <b>80</b> and <b>433</b>.
      */
-    private int port = -1;
+    private int port = 80;
 
     /**
      * The host name used in the REST call, e.g. <b>xceptance.com</b>.
@@ -464,16 +465,16 @@ public class RESTCall
     public RESTCall setDefinitionClass( final Class<?> resourceDef )
     {
         // Do nothing if the class is null
-        if( resourceDef != null )
+        if ( resourceDef != null )
         {
             readResourceDefinition( resourceDef );
             readHttpMethodDefinition( resourceDef );
             readHttpHeaderDefinition( resourceDef );
         }
-        
+
         return this;
     }
-    
+
     /**
      * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map
      * the Url into the internal representation. It assumes that the last path
@@ -493,7 +494,9 @@ public class RESTCall
 
     /**
      * Creates the REST Url. All elements are Url encoded. The host name is
-     * mandatory.
+     * mandatory. The default protocol is <b>http</b> and its default port is
+     * <b>80</b>. If the protocol is <b>https</b> its default port is
+     * <b>433</b>.
      * 
      * @return The Url ready to call. Returns <b>null</b> if the host name is
      *         missing.
@@ -503,12 +506,7 @@ public class RESTCall
         // String builder that builds the Url.
         StringBuilder builder = new StringBuilder();
 
-        // If the protocol and the port appear in following combinations, ignore
-        // them: http => 80, https => 433.
-        boolean skipProtocolAndPort = ( this.protocol.equals( "http" ) && this.port == 80 )
-                || ( this.protocol.equals( "https" ) && this.port == 433 );
-
-        if ( !this.protocol.isEmpty() && !skipProtocolAndPort )
+        if ( !this.protocol.isEmpty() )
             builder.append( this.protocol ).append( "://" );
 
         // A Url without host name does not make any sense.
@@ -517,7 +515,7 @@ public class RESTCall
 
         builder.append( hostName );
 
-        if ( this.port != -1 && !skipProtocolAndPort )
+        if ( this.port <= 0 )
             builder.append( ":" ).append( this.port );
 
         if ( !this.basePath.isEmpty() )
@@ -788,6 +786,10 @@ public class RESTCall
         return process();
     }
 
+    /****************************************************************************************
+     ************************ Public Methods - Response Handling ****************************
+     ****************************************************************************************/
+
     /**
      * Sets the response of this REST call. When performing the configured REST
      * call ( {@link #process() }) the REST response is set automatically.
@@ -801,6 +803,37 @@ public class RESTCall
     {
         this.response = response;
         return this;
+    }
+
+    /**
+     * Returns the response body as String. The REST call must be performed
+     * before this method can return a body. Otherwise this method returns null.
+     * 
+     * @return The response body as String.
+     */
+    public String getResponseBodyAsString()
+    {
+        // Return null if the REST call has no response yet.
+        if ( this.response == null )
+            return null;
+
+        return this.response.getContentAsString();
+    }
+
+    /**
+     * Returns the response body as {@link com.xceptance.xrt.document.JSON JSON}
+     * . The REST call must be performed before this method can return a body.
+     * Otherwise this method returns null.
+     * 
+     * @return The response body as String.
+     */
+    public JSON getResponseBodyAsJSON()
+    {
+        // Return null if the REST call has no response yet.
+        if ( this.response == null )
+            return null;
+
+        return new JSON( this.response.getContentAsString() );
     }
 
     /****************************************************************************************

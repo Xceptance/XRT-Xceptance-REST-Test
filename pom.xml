@@ -24,5 +24,16 @@
   		<artifactId>xlt</artifactId>
   		<version>4.2.10</version>
   	</dependency>
+  	<dependency>
+    	<groupId>com.jayway.jsonpath</groupId>
+    	<artifactId>json-path</artifactId>
+    	<version>0.9.1</version>
+	</dependency>
+
+	<dependency>
+    	<groupId>com.jayway.jsonpath</groupId>
+    	<artifactId>json-path-assert</artifactId>
+    	<version>0.9.1</version>
+	</dependency>
   </dependencies>
 </project>
