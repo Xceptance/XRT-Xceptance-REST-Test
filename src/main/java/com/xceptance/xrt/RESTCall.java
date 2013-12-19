@@ -1,11 +1,13 @@
 package com.xceptance.xrt;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.xceptance.xrt.document.JSON;
 
 /**
@@ -834,6 +836,38 @@ public class RESTCall
             return null;
 
         return new JSON( this.response.getContentAsString() );
+    }
+
+    /**
+     * Returns the response status code, e.g. 200 or 400. The REST call must be
+     * performed before this method can return a status code. Otherwise -1 is
+     * returned.
+     * 
+     * @return The response status code.
+     */
+    public final int getResponseStatusCode()
+    {
+        // Return null if the REST call has no response yet.
+        if ( this.response == null )
+            return -1;
+
+        return this.response.getStatusCode();
+    }
+
+    /**
+     * Returns the response HTTP headers as a list of name-value pairs. The REST
+     * call must be performed before this method can return a status code.
+     * Otherwise null is returned.
+     * 
+     * @return The response status code.
+     */
+    public final List<NameValuePair> getResponseHttpHeaders()
+    {
+        // Return null if the REST call has no response yet.
+        if ( this.response == null )
+            return null;
+
+        return this.response.getResponseHeaders();
     }
 
     /****************************************************************************************
