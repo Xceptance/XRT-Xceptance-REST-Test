@@ -1,0 +1,4 @@
+Xceptance REST Test
+===================
+
+Utility library for testing REST interfaces. The main purpose are functional tests but because this library is based on XLT also load and performance tests are possible. 
