@@ -88,6 +88,12 @@ public class RESTCall
     private Map<String, String> httpHeaders = new HashMap<String, String>();
 
     /**
+     * The request body of the REST call. Certain HTTP methods, e.g. POST, can
+     * send a body.
+     */
+    private String requestBody;
+
+    /**
      * The response of the REST call.
      */
     private WebResponse response;
@@ -677,6 +683,69 @@ public class RESTCall
     }
 
     /**
+     * Returns <b>true</b> if the REST call configuration contains a request
+     * body, <b>false</b> if not.
+     * 
+     * @return <b>true</b> if the REST call configuration contains a request
+     *         body, <b>false</b> if not.
+     */
+    public boolean hasRequestBody()
+    {
+        return this.requestBody != null ? true : false;
+    }
+
+    /**
+     * Sets the request body of the REST call.
+     * 
+     * @param requestBody
+     *            The body of the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setRequestBody( final String requestBody )
+    {
+        this.requestBody = requestBody;
+        return this;
+    }
+
+    /**
+     * Sets the request body of the REST call.
+     * 
+     * @param requestBody
+     *            The body of the REST call. Uses the toString() method of the
+     *            object to set the body.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setRequestBody( Object requestBody )
+    {
+        this.requestBody = requestBody.toString();
+        return this;
+    }
+
+    /**
+     * Returns the request body of this REST call configuration.
+     * 
+     * @return The request body of this REST call configuration. If no request
+     *         body was set, <b>null</b> is returned.
+     */
+    public String getRequestBody()
+    {
+        return this.requestBody;
+    }
+
+    /**
+     * Removes the request body from the REST call configuration.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeRequestBody()
+    {
+        this.requestBody = null;
+        return this;
+    }
+
+    /**
      * Makes the call using the configured Url ( {@link #getUrl()} ), the HTTP
      * headers, and the HTTP method.
      * 
@@ -720,6 +789,24 @@ public class RESTCall
 
     /**
      * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with POST, sets the request body, and performs the
+     * call.
+     * 
+     * @param requestBody
+     *            The request body used in the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall post( final String requestBody ) throws Throwable
+    {
+        this.requestBody = requestBody;
+        return post();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
      * for the HTTP method with PUT and performs the call.
      * 
      * @return The updated RESTCall instance.
@@ -730,6 +817,24 @@ public class RESTCall
     {
         this.httpMethod = HttpMethod.PUT;
         return process();
+    }
+
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with PUT, sets the request body, and performs the
+     * call.
+     * 
+     * @param requestBody
+     *            The request body used in the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall put( final String requestBody ) throws Throwable
+    {
+        this.requestBody = requestBody;
+        return put();
     }
 
     /**
