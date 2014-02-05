@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.document.JSON;
 
 /**
@@ -984,7 +985,79 @@ public class RESTCall
      */
     private final void readGlobalSettings()
     {
-        // TODO Implement global settings.
+        // Read regular global settings
+        XltProperties globSettings = XltProperties.getInstance();
+
+        this.hostName = globSettings.getProperty( "com.xceptance.xrt.host", this.hostName );
+        this.protocol = globSettings.getProperty( "com.xceptance.xrt.protocol", this.protocol );
+        this.port = globSettings.getProperty( "com.xceptance.xrt.port", this.port );
+        this.basePath = globSettings.getProperty( "com.xceptance.xrt.basePath", this.basePath );
+        this.resourcePath = globSettings.getProperty( "com.xceptance.xrt.resourcePath", this.resourcePath );
+        this.fragment = globSettings.getProperty( "com.xceptance.xrt.fragment", this.fragment );
+
+        // Read settings that contain a list of key-value pairs.
+        readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
+        readGlobalListProperty( "com.xceptance.xrt.http.headers", this.httpHeaders );
+
+        // Read the HTTP method property
+        String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method", this.httpMethod.toString() )
+                .toLowerCase();
+        switch ( httpMethod )
+        {
+            case "get":
+                this.httpMethod = HttpMethod.GET;
+                break;
+            case "post":
+                this.httpMethod = HttpMethod.POST;
+                break;
+            case "put":
+                this.httpMethod = HttpMethod.PUT;
+                break;
+            case "delete":
+                this.httpMethod = HttpMethod.DELETE;
+                break;
+            case "head":
+                this.httpMethod = HttpMethod.HEAD;
+                break;
+            case "options":
+                this.httpMethod = HttpMethod.OPTIONS;
+                break;
+            case "trace":
+                this.httpMethod = HttpMethod.TRACE;
+                break;
+        }
+    }
+
+    /**
+     * Reads the global settings of a property that contains a list of key-value
+     * pairs and stores them in the corresponding map.
+     * 
+     * @param key
+     *            The identifier of the property in the global settings.
+     * @param propertyMap
+     *            The map that needs to be filled with the key-value pairs of
+     *            the property.
+     */
+    private final void readGlobalListProperty( final String key, Map<String, String> propertyMap )
+    {
+        String list = XltProperties.getInstance().getProperty( key );
+
+        // if no value was found for that property, skip next steps
+        if ( list == null )
+            return;
+
+        // Get all key-value pairs and iterate through them.
+        String[] valPairArray = list.split( "," );
+        for ( String pairString : valPairArray )
+        {
+            // Separate key from value and check if both are valid.
+            String[] keyValueArray = pairString.split( ":" );
+            if ( keyValueArray.length != 2 || keyValueArray[0].isEmpty() || keyValueArray[1].isEmpty() )
+                continue;
+
+            // Add the key value pair to the property map.
+            propertyMap.put( keyValueArray[0], keyValueArray[1] );
+        }
     }
 
     /**
