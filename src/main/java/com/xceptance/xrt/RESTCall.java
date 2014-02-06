@@ -41,12 +41,12 @@ public class RESTCall
     /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
-    private String protocol = "http";
+    private String protocol = "";
 
     /**
      * The port used in the REST call, e.g. <b>80</b> and <b>433</b>.
      */
-    private int port = 80;
+    private int port = -1;
 
     /**
      * The host name used in the REST call, e.g. <b>xceptance.com</b>.
@@ -515,7 +515,7 @@ public class RESTCall
         // String builder that builds the Url.
         StringBuilder builder = new StringBuilder();
 
-        if ( !this.protocol.isEmpty() )
+        if ( !this.protocol.isEmpty() && !this.protocol.equals( "http" ) )
             builder.append( this.protocol ).append( "://" );
 
         // A Url without host name does not make any sense.
@@ -524,7 +524,8 @@ public class RESTCall
 
         builder.append( hostName );
 
-        if ( this.port <= 0 )
+        if ( this.port > 0 && !( this.port == 80 && this.protocol.equals( "http" ) )
+                && !( this.port == 443 && this.protocol.equals( "https" ) ) )
             builder.append( ":" ).append( this.port );
 
         if ( !this.basePath.isEmpty() )
@@ -1000,8 +1001,11 @@ public class RESTCall
         readGlobalListProperty( "com.xceptance.xrt.http.headers", this.httpHeaders );
 
         // Read the HTTP method property
-        String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method", this.httpMethod.toString() )
-                .toLowerCase();
+        String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method" );
+        if ( httpMethod == null )
+            return;
+
+        httpMethod = httpMethod.toLowerCase();
         switch ( httpMethod )
         {
             case "get":

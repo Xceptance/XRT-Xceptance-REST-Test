@@ -38,7 +38,7 @@ public @interface ResourceDefinition
      * 
      * @return The default protocol used by the REST resource.
      */
-    String protocol() default "http";
+    String protocol() default "";
 
     /**
      * The default value of the used port. This value overrides the port of the
@@ -46,7 +46,7 @@ public @interface ResourceDefinition
      * 
      * @return The default port used by the REST resource.
      */
-    int port() default 80;
+    int port() default -1;
 
     /**
      * <p>
