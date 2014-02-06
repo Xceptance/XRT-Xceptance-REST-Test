@@ -29,7 +29,6 @@ import com.xceptance.xrt.document.JSON;
 public class RESTCall
 {
     // TODO Url encoding
-    // TODO Add placeholder management
 
     /****************************************************************************************
      ************************ Private Properties ********************************************
@@ -99,6 +98,12 @@ public class RESTCall
      */
     private WebResponse response;
 
+    /**
+     * The map of placeholders that are replaced by their values in the final
+     * REST call.
+     */
+    private Map<String, String> placeholders = new HashMap<String, String>();
+
     /****************************************************************************************
      ************************ Constructors **************************************************
      ****************************************************************************************/
@@ -140,10 +145,7 @@ public class RESTCall
     public RESTCall( final Class<?> resourceDef )
     {
         readGlobalSettings();
-
-        readResourceDefinition( resourceDef );
-        readHttpMethodDefinition( resourceDef );
-        readHttpHeaderDefinition( resourceDef );
+        setDefinitionClass( resourceDef );
     }
 
     /**
@@ -479,6 +481,7 @@ public class RESTCall
             readResourceDefinition( resourceDef );
             readHttpMethodDefinition( resourceDef );
             readHttpHeaderDefinition( resourceDef );
+            readPlaceholderDefinition( resourceDef );
         }
 
         return this;
@@ -548,7 +551,7 @@ public class RESTCall
         if ( !this.fragment.isEmpty() )
             builder.append( "#" ).append( this.fragment );
 
-        return builder.toString();
+        return replacePlaceholders( builder.toString() );
     }
 
     /**
@@ -685,6 +688,134 @@ public class RESTCall
     }
 
     /**
+     * <p>
+     * XRT supports the concepts of placeholders. Any part of the URL can
+     * contain a placeholder that is replaced by a value right before the REST
+     * call is performed. Here is an example:
+     * </p>
+     * <br/>
+     * 
+     * <p>
+     * <i>anyhost.com/base/path/resource/${id}?query=value</i>
+     * </p>
+     * <br/>
+     * 
+     * <p>
+     * If the REST call instance knows about the placeholder, this can be
+     * replaced:
+     * </p>
+     * <br/>
+     * <p>
+     * <i>id:foobar => anyhost.com/base/path/resource/foobar?query=value</i>
+     * </p>
+     * 
+     * <br/>
+     * <p>
+     * This method adds/updates a placeholder value to the REST call
+     * configuration. Since placeholders must be unique the new placeholder
+     * value replaces an already existing one with the same name.
+     * </p>
+     * 
+     * @param name
+     *            The name of the placeholder, e.g. <b>id</b>.
+     * @param value
+     *            The value of the placeholder, e.g. <b>foobar</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addPlaceholderValue( String name, String value )
+    {
+        this.placeholders.put( name, value );
+        return this;
+    }
+
+    /**
+     * Adds/updates several placeholder values to the REST call configuration.
+     * Since placeholders must be unique the new placeholder values replace
+     * already existing ones with the same name.
+     * 
+     * @param placeholderValues
+     *            A map of placeholder name-value pairs. The key element in the
+     *            map should be the name of the placeholder, the value element
+     *            should be its value.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall addAllPlaceholderValues( Map<String, String> placeholderValues )
+    {
+        this.placeholders.putAll( placeholderValues );
+        return this;
+    }
+
+    /**
+     * Returns the value of the placeholder with the given name.
+     * 
+     * @param name
+     *            The name of the placeholder, e.g. <b>id</b>.
+     * 
+     * @return The value of the placeholder with the given name. If no value was
+     *         found <b>null</b> is returned.
+     */
+    public final String getPlaceholderValue( String name )
+    {
+        return this.placeholders.get( name );
+    }
+
+    /**
+     * Returns a map of the configured placeholder values for this REST call.
+     * 
+     * @return A map of the configured placeholder values for this REST call.
+     */
+    public final Map<String, String> getPlaceholderValues()
+    {
+        return this.placeholders;
+    }
+
+    /**
+     * Removes a placeholder value from the REST call configuration by its name.
+     * 
+     * @param name
+     *            The name of the placeholder, e.g. <b>id</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removePlaceholderValue( String name )
+    {
+        this.placeholders.remove( name );
+        return this;
+    }
+
+    /**
+     * Removes several placeholder values from the REST call configuration by
+     * their names.
+     * 
+     * @param names
+     *            An array of names of the placeholders, e.g. <b>id</b>.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removePlaceholderValues( String... names )
+    {
+        // Loop through all names of the array and remove the corresponding
+        // placeholder values from the map.
+        for ( String name : names )
+            this.placeholders.remove( name );
+
+        return this;
+    }
+
+    /**
+     * Removes all placeholder values from the REST call configuration.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall removeAllPlaceholderValues()
+    {
+        this.placeholders = new HashMap<String, String>();
+        return this;
+    }
+
+    /**
      * Returns <b>true</b> if the REST call configuration contains a request
      * body, <b>false</b> if not.
      * 
@@ -733,7 +864,7 @@ public class RESTCall
      */
     public String getRequestBody()
     {
-        return this.requestBody;
+        return replacePlaceholders( this.requestBody );
     }
 
     /**
@@ -999,6 +1130,7 @@ public class RESTCall
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
         readGlobalListProperty( "com.xceptance.xrt.http.headers", this.httpHeaders );
+        readGlobalListProperty( "com.xceptance.xrt.placeholders", this.placeholders );
 
         // Read the HTTP method property
         String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method" );
@@ -1155,6 +1287,29 @@ public class RESTCall
         for ( HttpHeader header : def.value() )
         {
             this.httpHeaders.put( header.name(), header.value() );
+        }
+    }
+
+    /**
+     * Reads the placeholder settings from the resource definition class and
+     * applies them.
+     * 
+     * @param resourceDef
+     *            A class that has the annotation {@link PlaceholderDefinition}.
+     */
+    private final void readPlaceholderDefinition( final Class<?> resourceDef )
+    {
+        PlaceholderDefinition def = resourceDef.getAnnotation( PlaceholderDefinition.class );
+
+        // If there is no annotation stop processing.
+        if ( def == null )
+            return;
+
+        // Loop through all placeholders of the definition and add them to the
+        // placeholder map
+        for ( Placeholder placeholder : def.value() )
+        {
+            this.placeholders.put( placeholder.name(), placeholder.value() );
         }
     }
 
@@ -1387,5 +1542,26 @@ public class RESTCall
             sanitizedUrl = sanitizedUrl.substring( 0, sanitizedUrl.length() - 1 );
 
         return sanitizedUrl;
+    }
+
+    /**
+     * Replaces all placeholders with the given key-value map.
+     * 
+     * @param content
+     *            The content that contains placeholders that need to be
+     *            replaced.
+     * 
+     * @return The content with the replaced placeholders.
+     */
+    private String replacePlaceholders( final String content )
+    {
+        String retContent = content;
+
+        for ( Entry<String, String> placeholder : this.placeholders.entrySet() )
+        {
+            retContent = retContent.replaceAll( "\\$\\{" + placeholder.getKey() + "\\}", placeholder.getValue() );
+        }
+
+        return retContent;
     }
 }
