@@ -38,6 +38,12 @@ public class RESTCall
     // exceptions.
 
     /**
+     * The action name that appears in the load test report after the REST call
+     * was performed.
+     */
+    private String actionName = "";
+
+    /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
     private String protocol = "";
@@ -166,6 +172,38 @@ public class RESTCall
     /****************************************************************************************
      ************************ Public Methods ************************************************
      ****************************************************************************************/
+
+    /**
+     * Sets the action name for the REST call. This name appears in the XLT load
+     * test report once the REST call was performed during a load test.
+     * 
+     * @param actionName
+     *            The name of the REST call action.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setActionName( final String actionName )
+    {
+        if ( actionName != null )
+            this.actionName = actionName;
+
+        return this;
+    }
+
+    /**
+     * Returns the action name of the REST call. If no action name was provided
+     * the resource path is returned.
+     * 
+     * @return The action name of the REST call.
+     */
+    public String getActionName()
+    {
+        // If no action name was provided return the resource path.
+        if ( this.actionName.isEmpty() )
+            return this.resourcePath;
+
+        return this.actionName;
+    }
 
     /**
      * Sets the protocol of this REST call, e.g. <b>http</b>. It's not necessary
@@ -508,7 +546,7 @@ public class RESTCall
      * Creates the REST Url. All elements are Url encoded. The host name is
      * mandatory. The default protocol is <b>http</b> and its default port is
      * <b>80</b>. If the protocol is <b>https</b> its default port is
-     * <b>433</b>.
+     * <b>433</b>. All placeholders were replaced by their corresponding values.
      * 
      * @return The Url ready to call. Returns <b>null</b> if the host name is
      *         missing.
@@ -857,7 +895,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the request body of this REST call configuration.
+     * Returns the request body of this REST call configuration. All
+     * placeholders in the body were replaced by their corresponding values.
      * 
      * @return The request body of this REST call configuration. If no request
      *         body was set, <b>null</b> is returned.
@@ -1247,6 +1286,9 @@ public class RESTCall
 
         if ( !def.fragment().isEmpty() )
             this.fragment = def.fragment();
+        
+        if ( !def.actionName().isEmpty() )
+            this.actionName = def.actionName();
     }
 
     /**

@@ -8,7 +8,7 @@ import com.xceptance.xlt.api.htmlunit.LightWeightPage;
 import com.xceptance.xlt.engine.XltWebClient;
 
 /**
- * 
+ * This class performs the REST call as configured in the REST call instance.
  * 
  * @author Patrick Thaele
  * 
@@ -20,10 +20,15 @@ public class XltRESTAction extends AbstractLightWeightPageAction
      */
     private final RESTCall restCall;
 
+    /**
+     * Constructor with minimum settings.
+     * 
+     * @param restCall
+     *            The instance that provides all settings for the REST call.
+     */
     public XltRESTAction( RESTCall restCall )
     {
-        // TODO Action needs a name.
-        super( "" );
+        super( restCall.getActionName() );
         this.restCall = restCall;
     }
 

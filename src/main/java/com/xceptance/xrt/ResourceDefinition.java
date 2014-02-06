@@ -33,6 +33,14 @@ import com.xceptance.xrt.QueryParameter;
 public @interface ResourceDefinition
 {
     /**
+     * The default value of the used action name. This value appears in the XLT
+     * load test report once the REST call was performed.
+     * 
+     * @return The default action name used by the REST resource.
+     */
+    String actionName() default "";
+
+    /**
      * The default value of the used protocol. This value overrides the protocol
      * of the {@link #baseUrl() baseUrl}.
      * 
