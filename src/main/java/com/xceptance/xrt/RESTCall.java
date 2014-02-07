@@ -1147,6 +1147,43 @@ public class RESTCall
         return this.response.getResponseHeaders();
     }
 
+    /**
+     * Returns the response HTTP header where the given name matches. The REST
+     * call must be performed before this method can return a status code.
+     * Otherwise null is returned. Also null is returned when the response
+     * header can not be found.
+     * 
+     * @param name
+     *            The name of the header to be found.
+     * 
+     * @return The response HTTP header value that was searched by its name.
+     *         Null if the header is not present.
+     */
+    public final String getResponseHttpHeader( final String name )
+    {
+        // Loop through all response HTTP headers and return the value where the
+        // name matches the first time.
+        for ( NameValuePair pair : getResponseHttpHeaders() )
+        {
+            if ( pair.getName().equals( name ) )
+                return pair.getValue();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the content type of the response. The REST
+     * call must be performed before this method can return a status code.
+     * Otherwise null is returned.
+     * 
+     * @return The content type of the response.
+     */
+    public final String getResponseContentType()
+    {
+        return getResponseHttpHeader( "Content-Type" );
+    }
+
     /****************************************************************************************
      ************************ Private Methods ***********************************************
      ****************************************************************************************/
@@ -1286,7 +1323,7 @@ public class RESTCall
 
         if ( !def.fragment().isEmpty() )
             this.fragment = def.fragment();
-        
+
         if ( !def.actionName().isEmpty() )
             this.actionName = def.actionName();
     }

@@ -91,7 +91,7 @@ public class XltRESTAction extends AbstractLightWeightPageAction
         // DEBUGGING - log response code, response HTTP headers, and response body
         XltLogger.runTimeLogger.debug( "Getting response..." );
         XltLogger.runTimeLogger.debug( "# Response - Status code:\t" + response.getStatusCode() );
-        XltLogger.runTimeLogger.debug( "# Response - HTTP method:\t" + response.getResponseHeaders().toString() );
+        XltLogger.runTimeLogger.debug( "# Response - HTTP header:\t" + response.getResponseHeaders().toString() );
         XltLogger.runTimeLogger.debug( "# Response - Body:\t" + response.getContentAsString() );
     }
 
