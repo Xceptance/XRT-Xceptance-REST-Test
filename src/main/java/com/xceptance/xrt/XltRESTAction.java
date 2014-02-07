@@ -3,8 +3,10 @@ package com.xceptance.xrt;
 import java.net.URL;
 
 import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.WebResponse;
 import com.xceptance.xlt.api.actions.AbstractLightWeightPageAction;
 import com.xceptance.xlt.api.htmlunit.LightWeightPage;
+import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.engine.XltWebClient;
 
 /**
@@ -51,20 +53,46 @@ public class XltRESTAction extends AbstractLightWeightPageAction
     @Override
     protected void execute() throws Exception
     {
+        // Call it once for debugging and execution for better performance.
+        String url = restCall.getUrl();
+        
+        // DEBUGGING - log URL, HTTP method, and HTTP headers
+        XltLogger.runTimeLogger.debug( "Start REST call..." );
+        XltLogger.runTimeLogger.debug( "# Request - URL:\t\t" + url );
+        XltLogger.runTimeLogger.debug( "# Request - HTTP method:\t" + restCall.getHttpMethod() );
+        XltLogger.runTimeLogger.debug( "# Request - HTTP headers:\t" + restCall.getHttpHeaders().toString() );
+        
+        
         // Setup the request.
-        WebRequest request = new WebRequest( new URL( restCall.getUrl() ), restCall.getHttpMethod() );
+        WebRequest request = new WebRequest( new URL( url ), restCall.getHttpMethod() );
         request.setAdditionalHeaders( restCall.getHttpHeaders() );
 
         // Set request body.
         if ( restCall.hasRequestBody() )
-            request.setRequestBody( restCall.getRequestBody() );
+        {
+            // Call it once for debugging and execution for better performance.
+            String requestBody = restCall.getRequestBody();
+            
+            // DEBUGGING - log request body
+            XltLogger.runTimeLogger.debug( "# Request - Body:\t" + requestBody );
+            
+            request.setRequestBody( requestBody );
+        }
 
         // Make the call.
         LightWeightPage page = ( (XltWebClient) getWebClient() ).getLightWeightPage( request );
         setLightWeightPage( page );
 
         // Store the response.
-        restCall.setRESTResponse( page.getWebResponse() );
+        WebResponse response = page.getWebResponse();
+        restCall.setRESTResponse( response );
+        
+        
+        // DEBUGGING - log response code, response HTTP headers, and response body
+        XltLogger.runTimeLogger.debug( "Getting response..." );
+        XltLogger.runTimeLogger.debug( "# Response - Status code:\t" + response.getStatusCode() );
+        XltLogger.runTimeLogger.debug( "# Response - HTTP method:\t" + response.getResponseHeaders().toString() );
+        XltLogger.runTimeLogger.debug( "# Response - Body:\t" + response.getContentAsString() );
     }
 
     /**
