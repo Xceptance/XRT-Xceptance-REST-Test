@@ -85,7 +85,7 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -104,7 +104,7 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com:8080", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com:8080", call.getUrl() );
     }
 
     /**
@@ -161,7 +161,7 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -181,7 +181,7 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com/base/path", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/base/path", call.getUrl() );
     }
 
     /**
@@ -201,7 +201,7 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com/resource", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/resource", call.getUrl() );
     }
 
     /**

@@ -46,7 +46,7 @@ public class RESTCall
     /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
-    private String protocol = "";
+    private String protocol = "http";
 
     /**
      * The port used in the REST call, e.g. <b>80</b> and <b>433</b>.
@@ -556,7 +556,7 @@ public class RESTCall
         // String builder that builds the Url.
         StringBuilder builder = new StringBuilder();
 
-        if ( !this.protocol.isEmpty() && !this.protocol.equals( "http" ) )
+        if ( !this.protocol.isEmpty() )
             builder.append( this.protocol ).append( "://" );
 
         // A Url without host name does not make any sense.

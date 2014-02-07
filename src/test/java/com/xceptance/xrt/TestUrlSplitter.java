@@ -91,7 +91,7 @@ public class TestUrlSplitter
         String url = "my.url.test.com";
         RESTCall call = new RESTCall( url );
 
-        Assert.assertEquals( "Expected Url: ", url, call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://" + url, call.getUrl() );
     }
 
     /**
@@ -114,7 +114,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com:abc" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -126,7 +126,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com:" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -137,7 +137,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com/" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -149,7 +149,7 @@ public class TestUrlSplitter
         String url = "my.url.test.com?param1=foo&param2=bar";
         RESTCall call = new RESTCall( url );
 
-        Assert.assertEquals( "Expected Url: ", url, call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://" + url, call.getUrl() );
     }
 
     /**
@@ -162,7 +162,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com?param1=foo&&param2=bar" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com?param1=foo&param2=bar", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com?param1=foo&param2=bar", call.getUrl() );
     }
 
     /**
@@ -175,7 +175,7 @@ public class TestUrlSplitter
         String url = "my.url.test.com?param1=&param2=bar";
         RESTCall call = new RESTCall( url );
 
-        Assert.assertEquals( "Expected Url: ", url, call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://" + url, call.getUrl() );
     }
 
     /**
@@ -187,7 +187,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com?=foo&param2=bar" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com?param2=bar", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com?param2=bar", call.getUrl() );
     }
 
     /**
@@ -199,7 +199,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com?" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -211,7 +211,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com??param1=foo&param2=bar" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com?param1=foo&param2=bar", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com?param1=foo&param2=bar", call.getUrl() );
     }
 
     /**
@@ -223,7 +223,7 @@ public class TestUrlSplitter
         String url = "my.url.test.com#fragment";
         RESTCall call = new RESTCall( url );
 
-        Assert.assertEquals( "Expected Url: ", url, call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://" + url, call.getUrl() );
     }
 
     /**
@@ -235,7 +235,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com#" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
@@ -247,7 +247,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com/resource?q=search#fragment1#fragment2" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com/resource?q=search#fragment1", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/resource?q=search#fragment1", call.getUrl() );
     }
 
     /**
@@ -259,6 +259,6 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "my.url.test.com/resource?q=search##fragment" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com/resource?q=search#fragment", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/resource?q=search#fragment", call.getUrl() );
     }
 }
