@@ -44,6 +44,12 @@ public class RESTCall
     private String actionName = "";
 
     /**
+     * The action that was performed before. Once this REST call was executed
+     * its action replaces the old previous action.
+     */
+    private XltRESTAction previousAction;
+
+    /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
      */
     private String protocol = "http";
@@ -203,6 +209,34 @@ public class RESTCall
             return this.resourcePath;
 
         return this.actionName;
+    }
+
+    /**
+     * Sets the previously performed REST action. XLT handles everything around
+     * sessions and cookies automatically when the previous action is known.
+     * 
+     * @param previousAction
+     *            The previously performed REST action. <b>null</b> removes the
+     *            old previous action.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setPreviousAction( XltRESTAction previousAction )
+    {
+        this.previousAction = previousAction;
+        return this;
+    }
+
+    /**
+     * Returns the previously performed REST action. This action can be set via
+     * {@link #setPreviousAction(XltRESTAction)} or is set after this REST call
+     * was performed. Returns <b>null</b> if none of the two conditions applies.
+     * 
+     * @return The previously performed REST action.
+     */
+    public XltRESTAction getPreviousAction()
+    {
+        return this.previousAction;
     }
 
     /**
@@ -726,6 +760,40 @@ public class RESTCall
     }
 
     /**
+     * Convenience method. Adds the <b>If-Match</b> header to the list of HTTP
+     * headers. The same action can be done by calling the method
+     * {@link #addHttpHeader(String, String)} with the header name
+     * <b>If-Match</b>.
+     * 
+     * @param ifMatchHeader
+     *            The value of the <b>If-Match</b> HTTP header.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setIfMatchHeader( final String ifMatchHeader )
+    {
+        addHttpHeader( "If-Match", ifMatchHeader );
+        return this;
+    }
+
+    /**
+     * Convenience method. Adds the <b>If-None-Match</b> header to the list of
+     * HTTP headers. The same action can be done by calling the method
+     * {@link #addHttpHeader(String, String)} with the header name
+     * <b>If-None-Match</b>.
+     * 
+     * @param ifNoneMatchHeader
+     *            The value of the <b>If-None-Match</b> HTTP header.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setIfNoneMatchHeader( final String ifNoneMatchHeader )
+    {
+        addHttpHeader( "If-None-Match", ifNoneMatchHeader );
+        return this;
+    }
+
+    /**
      * <p>
      * XRT supports the concepts of placeholders. Any part of the URL can
      * contain a placeholder that is replaced by a value right before the REST
@@ -1173,15 +1241,34 @@ public class RESTCall
     }
 
     /**
-     * Returns the content type of the response. The REST
-     * call must be performed before this method can return a status code.
-     * Otherwise null is returned.
+     * Returns the content type of the response. The REST call must be performed
+     * before this method can return a status code. Otherwise null is returned.
      * 
      * @return The content type of the response.
      */
     public final String getResponseContentType()
     {
         return getResponseHttpHeader( "Content-Type" );
+    }
+
+    /**
+     * <p>
+     * Convenience method. Returns the <b>ETag</b> header of the response. The
+     * same effect can be achieved by calling the method
+     * {@link #getResponseHttpHeader(String)}.
+     * </p>
+     * <br/>
+     * <p>
+     * The REST call must be performed before this method can return a status
+     * code. Otherwise null is returned.
+     * </p>
+     * 
+     * @return The <b>ETag</b> header value of the response. Returns <b>null</b>
+     *         if no <b>ETag</b> header was found.
+     */
+    public final String getResponseETag()
+    {
+        return getResponseHttpHeader( "ETag" );
     }
 
     /****************************************************************************************

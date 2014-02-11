@@ -30,7 +30,7 @@ public class XltRESTAction extends AbstractLightWeightPageAction
      */
     public XltRESTAction( RESTCall restCall )
     {
-        super( restCall.getActionName() );
+        super( restCall.getPreviousAction(), restCall.getActionName() );
         this.restCall = restCall;
     }
 
@@ -55,14 +55,13 @@ public class XltRESTAction extends AbstractLightWeightPageAction
     {
         // Call it once for debugging and execution for better performance.
         String url = restCall.getUrl();
-        
+
         // DEBUGGING - log URL, HTTP method, and HTTP headers
         XltLogger.runTimeLogger.debug( "Start REST call..." );
         XltLogger.runTimeLogger.debug( "# Request - URL:\t\t" + url );
         XltLogger.runTimeLogger.debug( "# Request - HTTP method:\t" + restCall.getHttpMethod() );
         XltLogger.runTimeLogger.debug( "# Request - HTTP headers:\t" + restCall.getHttpHeaders().toString() );
-        
-        
+
         // Setup the request.
         WebRequest request = new WebRequest( new URL( url ), restCall.getHttpMethod() );
         request.setAdditionalHeaders( restCall.getHttpHeaders() );
@@ -72,10 +71,10 @@ public class XltRESTAction extends AbstractLightWeightPageAction
         {
             // Call it once for debugging and execution for better performance.
             String requestBody = restCall.getRequestBody();
-            
+
             // DEBUGGING - log request body
             XltLogger.runTimeLogger.debug( "# Request - Body:\t" + requestBody );
-            
+
             request.setRequestBody( requestBody );
         }
 
@@ -83,12 +82,13 @@ public class XltRESTAction extends AbstractLightWeightPageAction
         LightWeightPage page = ( (XltWebClient) getWebClient() ).getLightWeightPage( request );
         setLightWeightPage( page );
 
-        // Store the response.
+        // Store the response and the previous action.
         WebResponse response = page.getWebResponse();
         restCall.setRESTResponse( response );
-        
-        
-        // DEBUGGING - log response code, response HTTP headers, and response body
+        restCall.setPreviousAction( this );
+
+        // DEBUGGING - log response code, response HTTP headers, and response
+        // body
         XltLogger.runTimeLogger.debug( "Getting response..." );
         XltLogger.runTimeLogger.debug( "# Response - Status code:\t" + response.getStatusCode() );
         XltLogger.runTimeLogger.debug( "# Response - HTTP header:\t" + response.getResponseHeaders().toString() );
