@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
@@ -34,6 +35,11 @@ public class RESTCall
      ************************ Private Properties ********************************************
      ****************************************************************************************/
 
+    /**
+     * Implements an automatic approach for action handling.
+     */
+    private static volatile ConcurrentHashMap<ThreadGroup, XltRESTAction> prevActionMap = new ConcurrentHashMap<ThreadGroup, XltRESTAction>();
+
     // All properties are initialized with an empty String to avoid NULL pointer
     // exceptions.
 
@@ -42,12 +48,6 @@ public class RESTCall
      * was performed.
      */
     private String actionName = "";
-
-    /**
-     * The action that was performed before. Once this REST call was executed
-     * its action replaces the old previous action.
-     */
-    private XltRESTAction previousAction;
 
     /**
      * The protocol used in the REST call, e.g. <b>http</b> and <b>https</b>.
@@ -214,16 +214,22 @@ public class RESTCall
     /**
      * Sets the previously performed REST action. XLT handles everything around
      * sessions and cookies automatically when the previous action is known.
+     * Removing the previous session by providing <b>null</b> as the value
+     * forces XLT to open a new web client with a new session.
      * 
      * @param previousAction
      *            The previously performed REST action. <b>null</b> removes the
-     *            old previous action.
+     *            old previous action and starts a new session.
      * 
      * @return The updated RESTCall instance.
      */
     public RESTCall setPreviousAction( XltRESTAction previousAction )
     {
-        this.previousAction = previousAction;
+        if ( previousAction == null )
+            prevActionMap.remove( Thread.currentThread().getThreadGroup() );
+        else
+            prevActionMap.put( Thread.currentThread().getThreadGroup(), previousAction );
+        
         return this;
     }
 
@@ -236,7 +242,7 @@ public class RESTCall
      */
     public XltRESTAction getPreviousAction()
     {
-        return this.previousAction;
+        return prevActionMap.get( Thread.currentThread().getThreadGroup() );
     }
 
     /**
