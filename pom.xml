@@ -5,6 +5,17 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Xceptance REST Test</name>
   <description>Test Framework for REST APIs</description>
+  <url>http://www.xceptance.com/</url>
+  
+  <organization>
+  	<name>Xceptance Software Technologies GmbH</name>
+  	<url>http://www.xceptance.de/</url>
+  </organization>
+  
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  	
+  </properties>
+  
   <build>
   	<plugins>
   		<plugin>
@@ -15,9 +26,50 @@
   				<source>1.7</source>
   				<target>1.7</target>
   			</configuration>
-  		</plugin>
+  		</plugin>        
   	</plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <show>public</show>
+        </configuration>
+      </plugin>
+      <plugin>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.7</version>
+            <reportSets>
+            	<reportSet>
+            		<reports>
+            			<report>index</report>
+                                <report>help</report>
+                                <report>project-team</report>
+                                <report>modules</report>
+                                <report>plugins</report>
+                                <report>cim</report>
+                                <report>issue-tracking</report>
+                                <report>scm</report>
+                                <report>license</report>
+                                <report>plugin-management</report>
+                                <report>distribution-management</report>
+                                <report>summary</report>
+                                <report>mailing-list</report>
+                                <report>issue-tracking</report>
+                                <!--
+                                <report>dependencies</report>
+                                -->
+            		</reports>
+            	</reportSet>
+            </reportSets>
+        </plugin>
+    </plugins>
+  </reporting>
+  
   <dependencies>
   	<dependency>
   		<groupId>com.xceptance</groupId>
@@ -36,4 +88,5 @@
     	<version>0.9.1</version>
 	</dependency>
   </dependencies>
+  
 </project>
