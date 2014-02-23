@@ -29,11 +29,11 @@ Default Validation
 public abstract class ExampleClazz
 {
 	/**
-	* Allows to validate the response code of the REST call.
+	* Allows to validate the status code of the REST call response.
 	*
-	* @param respCode The response code returned by the REST call, e.g. 200 or 404.
+	* @param statusCode The status code returned by the REST call, e.g. 200 or 404.
 	*/
-	public static void validateResponseCode( final int respCode )
+	public static void validateStatusCode( final int statusCode )
 	{
 		// Your validation code here.
 	}

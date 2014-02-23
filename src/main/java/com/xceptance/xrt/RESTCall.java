@@ -1,5 +1,9 @@
 package com.xceptance.xrt;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.document.JSON;
 
@@ -115,6 +120,20 @@ public class RESTCall
      * REST call.
      */
     private Map<String, String> placeholders = new HashMap<String, String>();
+
+    /****************************************************************************************
+     ************************ Private Default Validation Properties *************************
+     ****************************************************************************************/
+
+    /**
+     * The flag for default validation. The default value is <b>true</b>.
+     */
+    private boolean enableDefaultValidation = true;
+
+    /**
+     * All methods that allow to validate the status code of the response.
+     */
+    private List<Method> validateStatusCodeList = new ArrayList<Method>();
 
     /****************************************************************************************
      ************************ Constructors **************************************************
@@ -229,7 +248,7 @@ public class RESTCall
             prevActionMap.remove( Thread.currentThread().getThreadGroup() );
         else
             prevActionMap.put( Thread.currentThread().getThreadGroup(), previousAction );
-        
+
         return this;
     }
 
@@ -560,6 +579,7 @@ public class RESTCall
             readHttpMethodDefinition( resourceDef );
             readHttpHeaderDefinition( resourceDef );
             readPlaceholderDefinition( resourceDef );
+            readValidators( resourceDef );
         }
 
         return this;
@@ -1002,6 +1022,8 @@ public class RESTCall
     public RESTCall process() throws Throwable
     {
         new XltRESTAction( this ).run();
+        processValidators();
+
         return this;
     }
 
@@ -1277,6 +1299,21 @@ public class RESTCall
         return getResponseHttpHeader( "ETag" );
     }
 
+    /**
+     * Enables or disables default validation.
+     * 
+     * @param enabled
+     *            <b>true</b> enables default validation, <b>false</b> turns it
+     *            off.
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall defaultValidation( final boolean enabled )
+    {
+        this.enableDefaultValidation = enabled;
+
+        return this;
+    }
+
     /****************************************************************************************
      ************************ Private Methods ***********************************************
      ****************************************************************************************/
@@ -1482,6 +1519,124 @@ public class RESTCall
         for ( Placeholder placeholder : def.value() )
         {
             this.placeholders.put( placeholder.name(), placeholder.value() );
+        }
+    }
+
+    /**
+     * <p>
+     * Reads the validation methods of a resource definition class and adds them
+     * to the default validation lists.
+     * </p>
+     * <br/>
+     * <p>
+     * New validation methods can be added very easy:
+     * </p>
+     * <ul>
+     * <li>Add a new validation method list at the top of this class.</li>
+     * <li>Add a new {@link #getValidatorMethod(List, Class, String, Class...)}
+     * call to this method.</li>
+     * <li>Add a new loop in the {@link #processValidators()} method.</li>
+     * <li>Don't forget unit test coverage.</li>
+     * </ul>
+     * 
+     * @param resourceDef
+     *            A class that has static default validation methods.
+     */
+    private final void readValidators( final Class<?> resourceDef )
+    {
+        getValidatorMethod( validateStatusCodeList, resourceDef, "validateStatusCode", int.class );
+    }
+
+    /**
+     * <p>
+     * Extracts a specified validation method from a resource definition class
+     * and adds it to the specified list. A method is only added to the list if
+     * all of the following conditions are met:
+     * </p>
+     * <ul>
+     * <li>The method has the specified name.</li>
+     * <li>The method has the specified set of parameters.</li>
+     * <li>The method is static.</li>
+     * </ul>
+     * 
+     * @param methodList
+     *            The list a valid method is added to.
+     * @param resourceDef
+     *            The class that has static default validation methods.
+     * @param methodName
+     *            The name of the method.
+     * @param parameterTypes
+     *            The parameter types of the requested method.
+     */
+    private final void getValidatorMethod( List<Method> methodList, final Class<?> resourceDef,
+            final String methodName, Class<?>... parameterTypes )
+    {
+        // Get method with the specified name and the specified parameter types
+        try
+        {
+            Method method = resourceDef.getMethod( methodName, parameterTypes );
+
+            // Non-static validation methods are ignored to prevent invocation
+            // problems due to missing instantiation.
+            if ( !Modifier.isStatic( method.getModifiers() ) )
+            {
+                XltLogger.runTimeLogger
+                        .debug( "The validation method \"${methodName}\" is not static and is therefore ignored."
+                                .replace( "${methodName}", methodName ) );
+                return;
+            }
+
+            // The correct method was found - add it to the validation list.
+            methodList.add( method );
+
+        }
+        catch ( NoSuchMethodException e )
+        {
+            // Do nothing. Missing methods are ignored by design.
+        }
+        catch ( SecurityException e )
+        {
+            // Log message in XLT debug log.
+            XltLogger.runTimeLogger.debug( e.getMessage() );
+        }
+    }
+
+    /**
+     * Performs the default validation by looping through all the default
+     * validation lists.
+     */
+    private final void processValidators()
+    {
+        if ( enableDefaultValidation )
+            processValidatorList( this.validateStatusCodeList, this.response.getStatusCode() );
+    }
+
+    /**
+     * Invokes the validation methods of the given list with the given set of
+     * parameters.
+     * 
+     * @param methodList
+     *            The list that contains the validation methods.
+     * @param parameters
+     *            The array of parameters used to invoke the method.
+     */
+    private final void processValidatorList( final List<Method> methodList, final Object... parameters )
+    {
+        // Validate the response code
+        for ( Method method : methodList )
+        {
+            {
+                try
+                {
+                    method.invoke( null, parameters );
+                }
+                catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException e )
+                {
+                    // Should not occur because only valid methods are added to
+                    // the lists. If still an exception occurs log it.
+                    XltLogger.runTimeLogger.debug( e.getMessage() );
+                }
+            }
         }
     }
 
