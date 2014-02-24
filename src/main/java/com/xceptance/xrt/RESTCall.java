@@ -134,6 +134,22 @@ public class RESTCall
      * All methods that allow to validate the status code of the response.
      */
     private List<Method> validateStatusCodeList = new ArrayList<Method>();
+    
+    /**
+     * All methods that allow to validate the HTTP headers of the response.
+     */
+    private List<Method> validateHttpHeaders = new ArrayList<Method>();
+    
+    /**
+     * All methods that allow to validate the response body as String.
+     */
+    private List<Method> validateBodyAsString = new ArrayList<Method>();
+    
+    /**
+     * All methods that allow to validate the response body as JSON.
+     */
+    private List<Method> validateBodyAsJson = new ArrayList<Method>();
+    
 
     /****************************************************************************************
      ************************ Constructors **************************************************
@@ -1545,6 +1561,9 @@ public class RESTCall
     private final void readValidators( final Class<?> resourceDef )
     {
         getValidatorMethod( validateStatusCodeList, resourceDef, "validateStatusCode", int.class );
+        getValidatorMethod( validateHttpHeaders, resourceDef, "validateResponseHeaders", List.class );
+        getValidatorMethod( validateBodyAsString, resourceDef, "validateResponseBody", String.class );
+        getValidatorMethod( validateBodyAsJson, resourceDef, "validateResponseBody", JSON.class );
     }
 
     /**
@@ -1608,7 +1627,12 @@ public class RESTCall
     private final void processValidators()
     {
         if ( enableDefaultValidation )
-            processValidatorList( this.validateStatusCodeList, this.response.getStatusCode() );
+        {
+            processValidatorList( this.validateStatusCodeList, this.getResponseStatusCode() );
+            processValidatorList( this.validateHttpHeaders, this.getResponseHttpHeaders() );
+            processValidatorList( this.validateBodyAsString, this.getResponseBodyAsString() );
+            processValidatorList( this.validateBodyAsJson, this.getResponseBodyAsJSON() );
+        }
     }
 
     /**

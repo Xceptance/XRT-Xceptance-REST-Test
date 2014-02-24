@@ -115,8 +115,14 @@ public class TestDefaultValidation
         // Perform test REST call
         new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction ).get();
 
-        Assert.assertEquals( DefaultValidation_Correct.expValStatusCode + STATUS_CODE,
+        Assert.assertEquals( "Status code validation: ", DefaultValidation_Correct.expValStatusCode + STATUS_CODE,
                 DefaultValidation_Correct.valStatusCode );
+        Assert.assertEquals( "HTTP headers validation: ", DefaultValidation_Correct.expValHTTPHeaders
+                + HTTP_HEADERS.get( 0 ).toString(), DefaultValidation_Correct.valHTTPHeaders );
+        Assert.assertEquals( "Response body validation(String): ", DefaultValidation_Correct.expValBodyString
+                + RESPONSE_BODY, DefaultValidation_Correct.valBodyString );
+        Assert.assertEquals( "Response body validation(JSON): ", DefaultValidation_Correct.expValBodyJson,
+                DefaultValidation_Correct.valBodyJson );
     }
 
     /**
