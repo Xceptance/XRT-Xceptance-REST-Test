@@ -4,6 +4,8 @@ import org.hamcrest.Matcher;
 
 import com.jayway.jsonassert.JsonAssert;
 import com.jayway.jsonassert.JsonAsserter;
+import com.jayway.jsonpath.Filter;
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * This class manages everything around JSON documents. It allows to create new
@@ -27,6 +29,11 @@ public class JSON
      */
     JsonAsserter asserter;
 
+    /**
+     * The JSON content.
+     */
+    String json;
+
     /****************************************************************************************
      ************************ Constructors **************************************************
      ****************************************************************************************/
@@ -40,10 +47,42 @@ public class JSON
     public JSON( String json )
     {
         this.asserter = JsonAssert.with( json );
+        this.json = json;
     }
 
     /****************************************************************************************
-     ************************ Public Methods ************************************************
+     ************************ Public Methods - Getter **************************************
+     ****************************************************************************************/
+
+    /**
+     * Gets a property of the JSON via a specified jsonPath and an optional
+     * filter. This method uses the
+     * {@link JsonPath#read(String, String, Filter...)} method. On details how
+     * to use the filter please see {@link code.google.com/p/json-path}.
+     * 
+     * @param jsonPath
+     *            The jsonPath to the requested property.
+     * @param filters
+     *            Optional filters that allow to select certain items for lists.
+     * 
+     * @return The value of the requested JSON property.
+     */
+    public <T> T get( String jsonPath, Filter<?>... filters )
+    {
+        return JsonPath.read( this.toString(), jsonPath, filters );
+    }
+
+    /**
+     * Returns the JSON as String.
+     */
+    @Override
+    public String toString()
+    {
+        return this.json;
+    }
+
+    /****************************************************************************************
+     ************************ Public Methods - Asserts **************************************
      ****************************************************************************************/
 
     // Adapter methods for com.jayway.jsonassert.JsonAsserter. These methods are
