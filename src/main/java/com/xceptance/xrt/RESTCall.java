@@ -34,6 +34,8 @@ import com.xceptance.xrt.document.JSON;
 public class RESTCall
 {
     // TODO Url encoding
+    // TODO Add support for the HTTP method PATCH. Override
+    // com.gargoylesoftware.htmlunit.HttpMethod
 
     /****************************************************************************************
      ************************ Private Properties ********************************************
@@ -1619,7 +1621,7 @@ public class RESTCall
      * Performs the default validation by looping through all the default
      * validation lists.
      */
-    private final void processValidators()
+    private final void processValidators() throws Throwable
     {
         if ( enableDefaultValidation )
         {
@@ -1640,6 +1642,7 @@ public class RESTCall
      *            The array of parameters used to invoke the method.
      */
     private final void processValidatorList( final List<Method> methodList, final Object... parameters )
+            throws Throwable
     {
         // Validate the response code
         for ( Method method : methodList )
@@ -1649,7 +1652,11 @@ public class RESTCall
                 {
                     method.invoke( null, parameters );
                 }
-                catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException e )
+                catch ( InvocationTargetException e )
+                {
+                    throw e.getCause();
+                }
+                catch ( IllegalAccessException | IllegalArgumentException e )
                 {
                     // Should not occur because only valid methods are added to
                     // the lists. If still an exception occurs log it.

@@ -82,7 +82,7 @@ public class DefaultValidation_Correct
      *
      * @param body The body of the response as String.
      */
-     public static void validateResponseBody( final String body )
+    public static void validateResponseBody( final String body )
     {
         valBodyString = expValBodyString + body;
     }
