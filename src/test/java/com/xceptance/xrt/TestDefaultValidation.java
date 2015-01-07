@@ -13,12 +13,6 @@ import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.xceptance.xrt.validation.DefaultValidation_Correct;
 import com.xceptance.xrt.validation.DefaultValidation_CorrectStatusCode;
 import com.xceptance.xrt.validation.DefaultValidation_DerivedMethod;
-import com.xceptance.xrt.validation.DefaultValidation_DifferentReturnType;
-import com.xceptance.xrt.validation.DefaultValidation_IncorrectArgument;
-import com.xceptance.xrt.validation.DefaultValidation_IncorrectNoOfArguments;
-import com.xceptance.xrt.validation.DefaultValidation_NonStaticMethod;
-import com.xceptance.xrt.validation.DefaultValidation_PrivateMethod;
-import com.xceptance.xrt.validation.DefaultValidation_ProtectedMethod;
 
 /**
  * Unit tests for the method {@link RESTCall#processValidators()}.
@@ -97,12 +91,7 @@ public class TestDefaultValidation
 
     /**
      * <p>
-     * Validates if the default validation methods are called. These are the
-     * static methods that can be implemented and are called via reflection:
-     * </p>
-     * <ul>
-     * <li><i><b>public static void validateStatusCode( int )</b></i></li>
-     * </ul>
+     * Validates if the default validation methods are called.
      * 
      * @throws Throwable
      */
@@ -143,52 +132,9 @@ public class TestDefaultValidation
         Assert.assertEquals( DefaultValidation_CorrectStatusCode.expValStatusCode + STATUS_CODE,
                 DefaultValidation_CorrectStatusCode.valStatusCode );
     }
-
+    
     /**
-     * All validation methods must be static because the definition classes
-     * should be abstract and cannot be instantiated. Non static methods are
-     * ignored (debug log entry is created).
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void nonStaticMethodsAreNotCalled() throws Throwable
-    {
-        new RESTCall( DefaultValidation_NonStaticMethod.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_NonStaticMethod.valStatusCode );
-    }
-
-    /**
-     * The access modifier for the validation methods must be public. Private
-     * methods are not called.
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void privateMethods() throws Throwable
-    {
-        new RESTCall( DefaultValidation_PrivateMethod.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_PrivateMethod.valStatusCode );
-    }
-
-    /**
-     * The access modifier for the validation methods must be public. Protected
-     * methods are not called.
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void protectedMethods() throws Throwable
-    {
-        new RESTCall( DefaultValidation_ProtectedMethod.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_ProtectedMethod.valStatusCode );
-    }
-
-    /**
-     * To have less redundancy it is allowed to derive the static methods from a
+     * To have less redundancy it is allowed to derive the methods from a
      * super class.
      * 
      * @throws Throwable
@@ -204,50 +150,6 @@ public class TestDefaultValidation
 
         Assert.assertEquals( DefaultValidation_DerivedMethod.expValStatusCode + STATUS_CODE,
                 DefaultValidation_DerivedMethod.valStatusCode );
-    }
-
-    /**
-     * Only validation methods with the correct set of method parameters are
-     * executed. Other methods are ignored.
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void methodHasIncorrectArgType() throws Throwable
-    {
-        new RESTCall( DefaultValidation_IncorrectArgument.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_IncorrectArgument.valStatusCode );
-    }
-
-    /**
-     * Only validation methods with the correct set of method parameters are
-     * executed. Other methods are ignored.
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void methodHasIncorrectNumberOfArgs() throws Throwable
-    {
-        new RESTCall( DefaultValidation_IncorrectNoOfArguments.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_IncorrectNoOfArguments.valStatusCode );
-    }
-
-    /**
-     * The return type of validation methods is not limited to the <b>VOID</b>
-     * type by design. The static methods of a definition class can also be
-     * called outside of the RESTCall class.
-     * 
-     * @throws Throwable
-     */
-    @Test
-    public void returnTypeOfMethodDoesntMatter() throws Throwable
-    {
-        new RESTCall( DefaultValidation_DifferentReturnType.class ).setPreviousAction( mockAction ).get();
-
-        Assert.assertEquals( DefaultValidation_DifferentReturnType.expValStatusCode + STATUS_CODE,
-                DefaultValidation_DifferentReturnType.valStatusCode );
     }
 
     /**
