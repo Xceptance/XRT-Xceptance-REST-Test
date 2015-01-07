@@ -6,6 +6,7 @@ import com.jayway.jsonassert.JsonAssert;
 import com.jayway.jsonassert.JsonAsserter;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 /**
  * This class manages everything around JSON documents. It allows to create new
@@ -70,6 +71,29 @@ public class JSON
     public <T> T get( String jsonPath, Filter<?>... filters )
     {
         return JsonPath.read( this.toString(), jsonPath, filters );
+    }
+
+    /**
+     * Verifies the existence of a property within a JSON document.
+     * 
+     * @param jsonPath
+     *            The jsonPath to the requested property.
+     * @param filters
+     *            Optional filters that allow to select certain items for lists.
+     *            
+     * @return <b>true</b> if the path to the property exists, <b>false</b> if
+     *         not.
+     */
+    public boolean exists( String jsonPath, Filter<?>... filters )
+    {
+        try
+        {
+            return get( jsonPath, filters ) == null ? false : true;
+        }
+        catch ( PathNotFoundException e )
+        {
+            return false;
+        }
     }
 
     /**
