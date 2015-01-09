@@ -136,6 +136,27 @@ public class RESTCall
     List<DefaultValidation> defaultValidators = new ArrayList<>();
 
     /****************************************************************************************
+     ************************ Private Response Cache ****************************************
+     ****************************************************************************************/
+
+    /**
+     * The cache for the response content is filled when requested the first
+     * time and deleted when this instance is reused for another REST call.
+     */
+    private String responseContent;
+    
+    /**
+     * The cache for the response status code is filled when requested the first
+     * time and deleted when this instance is reused for another REST call.
+     */
+    private int responseStatusCode = -1;
+    
+    /**The cache for the response HTTP headers is filled when requested the first
+    * time and deleted when this instance is reused for another REST call.
+    */
+    private List<NameValuePair> responseHttpHeaders = null;
+
+    /****************************************************************************************
      ************************ Constructors **************************************************
      ****************************************************************************************/
 
@@ -1018,6 +1039,7 @@ public class RESTCall
      */
     public RESTCall process() throws Throwable
     {
+        clearResponseCaches();
         new XltRESTAction( this ).run();
         processValidators();
 
@@ -1185,11 +1207,11 @@ public class RESTCall
      */
     public String getResponseBodyAsString()
     {
-        // Return null if the REST call has no response yet.
-        if ( this.response == null )
-            return null;
+        // Cache response for further calls (e.g. validators)
+        if ( responseContent == null && this.response != null )
+            this.responseContent = this.response.getContentAsString();
 
-        return this.response.getContentAsString();
+        return this.responseContent;
     }
 
     /**
@@ -1205,7 +1227,7 @@ public class RESTCall
         if ( this.response == null )
             return null;
 
-        return new JSON( this.response.getContentAsString() );
+        return new JSON( getResponseBodyAsString() );
     }
 
     /**
@@ -1217,11 +1239,11 @@ public class RESTCall
      */
     public final int getResponseStatusCode()
     {
-        // Return null if the REST call has no response yet.
-        if ( this.response == null )
-            return -1;
-
-        return this.response.getStatusCode();
+        // Cache response for further calls (e.g. validators)
+        if(this.responseStatusCode == -1 && this.response != null)
+            this.responseStatusCode = this.response.getStatusCode();
+           
+        return this.responseStatusCode;
     }
 
     /**
@@ -1233,10 +1255,10 @@ public class RESTCall
      */
     public final List<NameValuePair> getResponseHttpHeaders()
     {
-        // Return null if the REST call has no response yet.
-        if ( this.response == null )
-            return null;
-
+        // Cache response for further calls (e.g. validators)
+        if(this.responseHttpHeaders == null && this.response != null)
+            this.responseHttpHeaders = this.response.getResponseHeaders();
+        
         return this.response.getResponseHeaders();
     }
 
@@ -1549,6 +1571,19 @@ public class RESTCall
                 XltLogger.runTimeLogger.error( "Default validation failed!\n" + e.toString() );
             }
         }
+    }
+
+    /**
+     * Some response data is processed in validators and is therefore requested
+     * several times after a REST call. The caches reduce the memory consumption
+     * and calculation time. When the same RESTCall instance is used again the
+     * cached response data needs to be cleared.
+     */
+    private final void clearResponseCaches()
+    {
+        responseStatusCode = -1;
+        responseHttpHeaders = null;
+        responseContent = null;
     }
 
     /**
