@@ -3,10 +3,9 @@ package com.xceptance.xrt;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
@@ -132,10 +131,10 @@ public class TestDefaultValidation
         Assert.assertEquals( DefaultValidation_CorrectStatusCode.expValStatusCode + STATUS_CODE,
                 DefaultValidation_CorrectStatusCode.valStatusCode );
     }
-    
+
     /**
-     * To have less redundancy it is allowed to derive the methods from a
-     * super class.
+     * To have less redundancy it is allowed to derive the methods from a super
+     * class.
      * 
      * @throws Throwable
      */
