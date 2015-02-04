@@ -144,16 +144,18 @@ public class RESTCall
      * time and deleted when this instance is reused for another REST call.
      */
     private String responseContent;
-    
+
     /**
      * The cache for the response status code is filled when requested the first
      * time and deleted when this instance is reused for another REST call.
      */
     private int responseStatusCode = -1;
-    
-    /**The cache for the response HTTP headers is filled when requested the first
-    * time and deleted when this instance is reused for another REST call.
-    */
+
+    /**
+     * The cache for the response HTTP headers is filled when requested the
+     * first time and deleted when this instance is reused for another REST
+     * call.
+     */
     private List<NameValuePair> responseHttpHeaders = null;
 
     /****************************************************************************************
@@ -1193,7 +1195,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall setRESTResponse( WebResponse response )
+    RESTCall setRESTResponse( WebResponse response )
     {
         this.response = response;
         return this;
@@ -1201,14 +1203,17 @@ public class RESTCall
 
     /**
      * Returns the response body as String. The REST call must be performed
-     * before this method can return a body. Otherwise this method returns null.
+     * before this method can return a body. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
      * 
      * @return The response body as String.
      */
     public String getResponseBodyAsString()
     {
+        checkRESTCallPerformed( "getResponseBodyAsString()" );
+
         // Cache response for further calls (e.g. validators)
-        if ( responseContent == null && this.response != null )
+        if ( responseContent == null )
             this.responseContent = this.response.getContentAsString();
 
         return this.responseContent;
@@ -1217,12 +1222,14 @@ public class RESTCall
     /**
      * Returns the response body as {@link com.xceptance.xrt.document.JSON JSON}
      * . The REST call must be performed before this method can return a body.
-     * Otherwise this method returns null.
+     * Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      * 
      * @return The response body as String.
      */
     public JSON getResponseBodyAsJSON()
     {
+        checkRESTCallPerformed( "getResponseBodyAsJSON()" );
+
         // Return null if the REST call has no response yet.
         if ( this.response == null )
             return null;
@@ -1232,41 +1239,45 @@ public class RESTCall
 
     /**
      * Returns the response status code, e.g. 200 or 400. The REST call must be
-     * performed before this method can return a status code. Otherwise -1 is
-     * returned.
+     * performed before this method can return a status code. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
      * 
      * @return The response status code.
      */
     public final int getResponseStatusCode()
     {
+        checkRESTCallPerformed( "getResponseStatusCode()" );
+
         // Cache response for further calls (e.g. validators)
-        if(this.responseStatusCode == -1 && this.response != null)
+        if ( this.responseStatusCode == -1 )
             this.responseStatusCode = this.response.getStatusCode();
-           
+
         return this.responseStatusCode;
     }
 
     /**
      * Returns the response HTTP headers as a list of name-value pairs. The REST
-     * call must be performed before this method can return a status code.
-     * Otherwise null is returned.
+     * call must be performed before this method can return the list. Otherwise
+     * a {@link RESTCallNotYetPerformedException} is thrown.
      * 
-     * @return The response status code.
+     * @return The list of response HTTP headers.
      */
     public final List<NameValuePair> getResponseHttpHeaders()
     {
+        checkRESTCallPerformed( "getResponseHttpHeaders()" );
+
         // Cache response for further calls (e.g. validators)
-        if(this.responseHttpHeaders == null && this.response != null)
+        if ( this.responseHttpHeaders == null )
             this.responseHttpHeaders = this.response.getResponseHeaders();
-        
-        return this.response.getResponseHeaders();
+
+        return this.responseHttpHeaders;
     }
 
     /**
-     * Returns the response HTTP header where the given name matches. The REST
-     * call must be performed before this method can return a status code.
-     * Otherwise null is returned. Also null is returned when the response
-     * header can not be found.
+     * Returns the response HTTP header where the given name matches. If the
+     * header can not be found null is returned. The REST call must be performed
+     * before this method can return a status code. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
      * 
      * @param name
      *            The name of the header to be found.
@@ -1276,6 +1287,8 @@ public class RESTCall
      */
     public final String getResponseHttpHeader( final String name )
     {
+        checkRESTCallPerformed( "getResponseHttpHeader(String)" );
+
         // Loop through all response HTTP headers and return the value where the
         // name matches the first time.
         for ( NameValuePair pair : getResponseHttpHeaders() )
@@ -1289,12 +1302,15 @@ public class RESTCall
 
     /**
      * Returns the content type of the response. The REST call must be performed
-     * before this method can return a status code. Otherwise null is returned.
+     * before this method can return a status code. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
      * 
      * @return The content type of the response.
      */
     public final String getResponseContentType()
     {
+        checkRESTCallPerformed( "getResponseContentType()" );
+
         return getResponseHttpHeader( "Content-Type" );
     }
 
@@ -1307,7 +1323,7 @@ public class RESTCall
      * <br/>
      * <p>
      * The REST call must be performed before this method can return a status
-     * code. Otherwise null is returned.
+     * code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      * </p>
      * 
      * @return The <b>ETag</b> header value of the response. Returns <b>null</b>
@@ -1315,6 +1331,8 @@ public class RESTCall
      */
     public final String getResponseETag()
     {
+        checkRESTCallPerformed( "getResponseETag()" );
+
         return getResponseHttpHeader( "ETag" );
     }
 
@@ -1854,5 +1872,28 @@ public class RESTCall
         }
 
         return retContent;
+    }
+
+    /**
+     * Is used in all methods that return response information and throws a
+     * {@link RESTCallNotYetPerformedException} if the REST call was not yet
+     * performed and response information cannot be returned.
+     * 
+     * @param methodName
+     *            The name of the method where this method is used. Class path
+     *            information is added automatically.
+     * @throws RESTCallNotYetPerformedException
+     *             Unchecked exception.
+     */
+    private void checkRESTCallPerformed( String methodName ) throws RESTCallNotYetPerformedException
+    {
+        if ( this.response == null )
+        {
+            if ( methodName == null || methodName.isEmpty() )
+                throw new RESTCallNotYetPerformedException();
+            else
+                throw new RESTCallNotYetPerformedException( "com.xceptance.xrt.RESTCall#" + methodName );
+        }
+
     }
 }
