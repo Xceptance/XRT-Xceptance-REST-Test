@@ -28,27 +28,27 @@ public class TestDefaultValidation
     /**
      * The mocked response body.
      */
-    private final static String RESPONSE_BODY = "{\"id\":\"test\"}";
+    private final String RESPONSE_BODY = "{\"id\":\"test\"}";
 
     /**
      * The mocked response status code.
      */
-    private final static int STATUS_CODE = 200;
+    private final int STATUS_CODE = 200;
 
     /**
      * The mocked response status message.
      */
-    private final static String STATUS_MESSAGE = "OK";
+    private final String STATUS_MESSAGE = "OK";
 
     /**
      * The mocked response content type.
      */
-    private final static String CONTENT_TYPE = "application/json";
+    private final String CONTENT_TYPE = "application/json";
 
     /**
      * The mocked response HTTP headers.
      */
-    private final static List<NameValuePair> HTTP_HEADERS = new ArrayList<>();
+    private final List<NameValuePair> HTTP_HEADERS = new ArrayList<>();
 
     /**
      * Action that prepared the WebClient to use a mocked web connection. Allows
