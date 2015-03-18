@@ -1,14 +1,19 @@
 package com.xceptance.xrt;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.RESTCall;
 import com.xceptance.xrt.RESTCallNotYetPerformedException;
 
@@ -62,6 +67,21 @@ public class TestRESTCallResponse
      */
     private XltRESTAction mockAction;
 
+    /**
+     * Define result dir to prevent timers.csv exceptions.
+     */
+    @BeforeClass
+    public static void setUpOnce()
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xlt.result-dir", "tmp" );
+    }
+    
+    @AfterClass
+    public static void tearDownFinally() throws Throwable
+    {
+        FileUtils.deleteDirectory( new File("tmp") );
+    }
+    
     /**
      * Test setup. Creates the mocked action that needs to be used in every test
      * as previous action.
