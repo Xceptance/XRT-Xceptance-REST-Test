@@ -1131,6 +1131,38 @@ public class RESTCall
         this.requestBody = requestBody;
         return put();
     }
+    
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with PATCH and performs the call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall patch() throws Throwable
+    {
+        this.httpMethod = HttpMethod.PATCH;
+        return process();
+    }
+    
+    /**
+     * This method is similar to {@link #process()}. It overrides the setting
+     * for the HTTP method with PATCH, sets the request body, and performs the
+     * call.
+     * 
+     * @param requestBody
+     *            The request body used in the REST call.
+     * 
+     * @return The updated RESTCall instance.
+     * 
+     * @throws Throwable
+     */
+    public RESTCall patch( final String requestBody ) throws Throwable
+    {
+        this.requestBody = requestBody;
+        return patch();
+    }
 
     /**
      * This method is similar to {@link #process()}. It overrides the setting
