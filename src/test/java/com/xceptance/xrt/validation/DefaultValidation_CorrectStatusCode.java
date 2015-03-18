@@ -1,6 +1,7 @@
 package com.xceptance.xrt.validation;
 
-import com.xceptance.xrt.DefaultValidation;
+import com.xceptance.xrt.AutoValidatable;
+import com.xceptance.xrt.RESTCallValidator;
 import com.xceptance.xrt.ResourceDefinition;
 
 /**
@@ -10,7 +11,7 @@ import com.xceptance.xrt.ResourceDefinition;
  * 
  */
 @ResourceDefinition( baseUrl = "www.xrt.com" )
-public class DefaultValidation_CorrectStatusCode extends DefaultValidation
+public class DefaultValidation_CorrectStatusCode implements AutoValidatable
 {
     /****************************************************************************************
      ************************ Validate Status Code ******************************************
@@ -33,8 +34,8 @@ public class DefaultValidation_CorrectStatusCode extends DefaultValidation
      *            The status code returned by the REST call, e.g. 200 or 404.
      */
     @Override
-    public void validateStatusCode( int statusCode )
+    public void validate( RESTCallValidator call )
     {
-        valStatusCode = expValStatusCode + statusCode;
+        valStatusCode = expValStatusCode + call.getResponseStatusCode();
     }
 }

@@ -133,7 +133,7 @@ public class RESTCall
     /**
      * Classes with default validation.
      */
-    List<DefaultValidation> defaultValidators = new ArrayList<>();
+    List<AutoValidatable> defaultValidators = new ArrayList<>();
 
     /****************************************************************************************
      ************************ Private Response Cache ****************************************
@@ -150,6 +150,12 @@ public class RESTCall
      * time and deleted when this instance is reused for another REST call.
      */
     private int responseStatusCode = -1;
+    
+    /**
+     * The cache for the response status message is filled when requested the first
+     * time and deleted when this instance is reused for another REST call.
+     */
+    private String responseStatusMessage;
 
     /**
      * The cache for the response HTTP headers is filled when requested the
@@ -314,7 +320,7 @@ public class RESTCall
      * 
      * @return The protocol of the REST call configuration.
      */
-    public final String getProtocol()
+    public String getProtocol()
     {
         return this.protocol;
     }
@@ -341,7 +347,7 @@ public class RESTCall
      * 
      * @return The port of the REST call configuration.
      */
-    public final int getPort()
+    public int getPort()
     {
         return this.port;
     }
@@ -369,7 +375,7 @@ public class RESTCall
      * 
      * @return The host name of the REST call configuration.
      */
-    public final String getHostName()
+    public String getHostName()
     {
         return this.hostName;
     }
@@ -400,7 +406,7 @@ public class RESTCall
      * 
      * @return The base path of the REST call configuration.
      */
-    public final String getBasePath()
+    public String getBasePath()
     {
         return this.basePath;
     }
@@ -431,7 +437,7 @@ public class RESTCall
      * 
      * @return The resource path of the REST call configuration.
      */
-    public final String getResourcePath()
+    public String getResourcePath()
     {
         return resourcePath;
     }
@@ -448,7 +454,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall addQueryParam( String name, String value )
+    public RESTCall addQueryParam( final String name, final String value )
     {
         this.queryParams.put( name, value );
         return this;
@@ -466,7 +472,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall addAllQueryParams( Map<String, String> queryParams )
+    public RESTCall addAllQueryParams( final Map<String, String> queryParams )
     {
         this.queryParams.putAll( queryParams );
         return this;
@@ -481,7 +487,7 @@ public class RESTCall
      * @return The value of the query parameter with the given name. If no value
      *         was found <b>null</b> is returned.
      */
-    public final String getQueryParam( String name )
+    public String getQueryParam( final String name )
     {
         return this.queryParams.get( name );
     }
@@ -492,7 +498,7 @@ public class RESTCall
      * 
      * @return A map of the configured query parameters for this REST call.
      */
-    public final Map<String, String> getQueryParams()
+    public Map<String, String> getQueryParams()
     {
         return this.queryParams;
     }
@@ -505,7 +511,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall removeQueryParam( String name )
+    public RESTCall removeQueryParam( final String name )
     {
         this.queryParams.remove( name );
         return this;
@@ -520,7 +526,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    public RESTCall removeQueryParams( String... names )
+    public RESTCall removeQueryParams( final String... names )
     {
         // Loop through all names of the array and remove the corresponding
         // parameters from the map.
@@ -564,7 +570,7 @@ public class RESTCall
      * 
      * @return The fragment of the REST call configuration.
      */
-    public final String getFragment()
+    public String getFragment()
     {
         return this.fragment;
     }
@@ -631,7 +637,7 @@ public class RESTCall
      * @return The Url ready to call. Returns <b>null</b> if the host name is
      *         missing.
      */
-    public final String getUrl()
+    public String getUrl()
     {
         // String builder that builds the Url.
         StringBuilder builder = new StringBuilder();
@@ -695,7 +701,7 @@ public class RESTCall
      * 
      * @see com.gargoylesoftware.htmlunit.HttpMethod
      */
-    public final HttpMethod getHttpMethod()
+    public HttpMethod getHttpMethod()
     {
         return this.httpMethod;
     }
@@ -744,7 +750,7 @@ public class RESTCall
      * @return The value of the HTTP header with the given name. If no value was
      *         found <b>null</b> is returned.
      */
-    public final String getHttpHeader( String name )
+    public String getHttpHeader( final String name )
     {
         return this.httpHeaders.get( name );
     }
@@ -755,7 +761,7 @@ public class RESTCall
      * 
      * @return A map of the configured HTTP headers for this REST call.
      */
-    public final Map<String, String> getHttpHeaders()
+    public Map<String, String> getHttpHeaders()
     {
         return this.httpHeaders;
     }
@@ -908,7 +914,7 @@ public class RESTCall
      * @return The value of the placeholder with the given name. If no value was
      *         found <b>null</b> is returned.
      */
-    public final String getPlaceholderValue( String name )
+    public String getPlaceholderValue( final String name )
     {
         return this.placeholders.get( name );
     }
@@ -918,7 +924,7 @@ public class RESTCall
      * 
      * @return A map of the configured placeholder values for this REST call.
      */
-    public final Map<String, String> getPlaceholderValues()
+    public Map<String, String> getPlaceholderValues()
     {
         return this.placeholders;
     }
@@ -1230,10 +1236,6 @@ public class RESTCall
     {
         checkRESTCallPerformed( "getResponseBodyAsJSON()" );
 
-        // Return null if the REST call has no response yet.
-        if ( this.response == null )
-            return null;
-
         return new JSON( getResponseBodyAsString() );
     }
 
@@ -1244,7 +1246,7 @@ public class RESTCall
      * 
      * @return The response status code.
      */
-    public final int getResponseStatusCode()
+    public int getResponseStatusCode()
     {
         checkRESTCallPerformed( "getResponseStatusCode()" );
 
@@ -1254,6 +1256,24 @@ public class RESTCall
 
         return this.responseStatusCode;
     }
+    
+    /**
+     * Returns the response status code, e.g. 200 or 400. The REST call must be
+     * performed before this method can return a status code. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
+     * 
+     * @return The response status code.
+     */
+    public String getResponseStatusMessage()
+    {
+        checkRESTCallPerformed( "getResponseStatusMessage()" );
+
+        // Cache response for further calls (e.g. validators)
+        if ( this.responseStatusMessage == null )
+            this.responseStatusMessage = this.response.getStatusMessage();
+
+        return this.responseStatusMessage;
+    }
 
     /**
      * Returns the response HTTP headers as a list of name-value pairs. The REST
@@ -1262,7 +1282,7 @@ public class RESTCall
      * 
      * @return The list of response HTTP headers.
      */
-    public final List<NameValuePair> getResponseHttpHeaders()
+    public List<NameValuePair> getResponseHttpHeaders()
     {
         checkRESTCallPerformed( "getResponseHttpHeaders()" );
 
@@ -1285,7 +1305,7 @@ public class RESTCall
      * @return The response HTTP header value that was searched by its name.
      *         Null if the header is not present.
      */
-    public final String getResponseHttpHeader( final String name )
+    public String getResponseHttpHeader( final String name )
     {
         checkRESTCallPerformed( "getResponseHttpHeader(String)" );
 
@@ -1307,7 +1327,7 @@ public class RESTCall
      * 
      * @return The content type of the response.
      */
-    public final String getResponseContentType()
+    public String getResponseContentType()
     {
         checkRESTCallPerformed( "getResponseContentType()" );
 
@@ -1329,7 +1349,7 @@ public class RESTCall
      * @return The <b>ETag</b> header value of the response. Returns <b>null</b>
      *         if no <b>ETag</b> header was found.
      */
-    public final String getResponseETag()
+    public String getResponseETag()
     {
         checkRESTCallPerformed( "getResponseETag()" );
 
@@ -1349,6 +1369,16 @@ public class RESTCall
         this.enableDefaultValidation = enabled;
 
         return this;
+    }
+    
+    /**
+     * Returns whether default validation is enabled or not.
+     * 
+     * @return <b>true</b> if default validation is enabled, <b>false</b> if not.
+     */
+    public boolean isDefaultValidationEnabled()
+    {
+        return this.enableDefaultValidation;
     }
 
     /****************************************************************************************
@@ -1573,15 +1603,15 @@ public class RESTCall
     private final <T> void readValidators( final Class<T> resourceDef )
     {
         // Check if the resource definition class implements default validation
-        // methods (derived from DefaultValidation.java)
-        if ( DefaultValidation.class.isAssignableFrom( resourceDef ) )
+        // methods (derived from AutoValidatable.java)
+        if ( AutoValidatable.class.isAssignableFrom( resourceDef ) )
         {
             // Create an instance of that class and put it into a list.
             Constructor<T> constr = null;
             try
             {
                 constr = resourceDef.getConstructor();
-                defaultValidators.add( (DefaultValidation) constr.newInstance() );
+                defaultValidators.add( (AutoValidatable) constr.newInstance() );
             }
             catch ( NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
                     | IllegalArgumentException | InvocationTargetException e )
@@ -1600,6 +1630,7 @@ public class RESTCall
     private final void clearResponseCaches()
     {
         responseStatusCode = -1;
+        responseStatusMessage = null;
         responseHttpHeaders = null;
         responseContent = null;
     }
@@ -1612,12 +1643,9 @@ public class RESTCall
     {
         if ( enableDefaultValidation )
         {
-            for ( DefaultValidation validator : defaultValidators )
+            for ( AutoValidatable validator : defaultValidators )
             {
-                validator.validateStatusCode( getResponseStatusCode() );
-                validator.validateResponseHeaders( getResponseHttpHeaders() );
-                validator.validateResponseBody( getResponseBodyAsString() );
-                validator.validateResponseBody( getResponseBodyAsJSON() );
+                validator.validate( new RESTCallValidator( this ) );
             }
         }
     }

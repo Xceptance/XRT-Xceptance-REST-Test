@@ -3,6 +3,7 @@ package com.xceptance.xrt;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
@@ -77,17 +78,19 @@ public class TestDefaultValidation
         mockAction = new XltRESTAction( new RESTCall() );
         mockAction.getWebClient().setWebConnection( connection );
     }
+    
+    @After
+    public void tearDown() throws Throwable
+    {
+        // Clean up status fields in definition classes
+        DefaultValidation_Correct.valPerformed = false;
+        DefaultValidation_CorrectStatusCode.valStatusCode = "Not yet executed.";
+    }
 
     /****************************************************************************************
      ************************ Default Validation Tests **************************************
      ****************************************************************************************/
-
-    /**
-     * The message of the default validation classes when the method was not
-     * called.
-     */
-    private final static String VALIDATOR_NOT_CALLED_MSG = "Not yet executed.";
-
+   
     /**
      * <p>
      * Validates if the default validation methods are called.
@@ -97,20 +100,9 @@ public class TestDefaultValidation
     @Test
     public void defaultValidation() throws Throwable
     {
-        // Reset validation status code
-        DefaultValidation_Correct.valStatusCode = VALIDATOR_NOT_CALLED_MSG;
-
-        // Perform test REST call
         new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction ).get();
 
-        Assert.assertEquals( "Status code validation: ", DefaultValidation_Correct.expValStatusCode + STATUS_CODE,
-                DefaultValidation_Correct.valStatusCode );
-        Assert.assertEquals( "HTTP headers validation: ", DefaultValidation_Correct.expValHTTPHeaders
-                + HTTP_HEADERS.get( 0 ).toString(), DefaultValidation_Correct.valHTTPHeaders );
-        Assert.assertEquals( "Response body validation(String): ", DefaultValidation_Correct.expValBodyString
-                + RESPONSE_BODY, DefaultValidation_Correct.valBodyString );
-        Assert.assertEquals( "Response body validation(JSON): ", DefaultValidation_Correct.expValBodyJson,
-                DefaultValidation_Correct.valBodyJson );
+        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
     }
 
     /**
@@ -126,8 +118,7 @@ public class TestDefaultValidation
         new RESTCall( DefaultValidation_Correct.class ).setDefinitionClass( DefaultValidation_CorrectStatusCode.class )
                 .setPreviousAction( mockAction ).get();
 
-        Assert.assertEquals( DefaultValidation_Correct.expValStatusCode + STATUS_CODE,
-                DefaultValidation_Correct.valStatusCode );
+        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
         Assert.assertEquals( DefaultValidation_CorrectStatusCode.expValStatusCode + STATUS_CODE,
                 DefaultValidation_CorrectStatusCode.valStatusCode );
     }
@@ -141,14 +132,9 @@ public class TestDefaultValidation
     @Test
     public void derivedMethods() throws Throwable
     {
-        // Reset validation status code
-        DefaultValidation_Correct.valStatusCode = VALIDATOR_NOT_CALLED_MSG;
-
-        // Perform test REST call
         new RESTCall( DefaultValidation_DerivedMethod.class ).setPreviousAction( mockAction ).get();
 
-        Assert.assertEquals( DefaultValidation_DerivedMethod.expValStatusCode + STATUS_CODE,
-                DefaultValidation_DerivedMethod.valStatusCode );
+        Assert.assertTrue( DefaultValidation_DerivedMethod.valPerformed );
     }
 
     /**
@@ -160,14 +146,16 @@ public class TestDefaultValidation
     @Test
     public void enableDefaultValidation() throws Throwable
     {
-        // Reset validation status code
-        DefaultValidation_Correct.valStatusCode = VALIDATOR_NOT_CALLED_MSG;
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
 
-        // Perform test REST call
-        new RESTCall( DefaultValidation_Correct.class ).defaultValidation( true ).setPreviousAction( mockAction ).get();
+        Assert.assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+        call.defaultValidation( true );
+        Assert.assertTrue( "Default validation should be enabled after using setter.",
+                call.isDefaultValidationEnabled() );
 
-        Assert.assertEquals( DefaultValidation_Correct.expValStatusCode + STATUS_CODE,
-                DefaultValidation_Correct.valStatusCode );
+        call.get();
+
+        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
     }
 
     /**
@@ -179,13 +167,14 @@ public class TestDefaultValidation
     @Test
     public void disableDefaultValidation() throws Throwable
     {
-        // Reset validation status code
-        DefaultValidation_Correct.valStatusCode = VALIDATOR_NOT_CALLED_MSG;
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
+        
+        Assert.assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+        call.defaultValidation( false );
+        Assert.assertFalse( "Default validation should be disabled after using setter.", call.isDefaultValidationEnabled() );
+        
+        call.get();
 
-        // Perform test REST call
-        new RESTCall( DefaultValidation_Correct.class ).defaultValidation( false ).setPreviousAction( mockAction )
-                .get();
-
-        Assert.assertEquals( VALIDATOR_NOT_CALLED_MSG, DefaultValidation_Correct.valStatusCode );
+        Assert.assertFalse( DefaultValidation_Correct.valPerformed );
     }
 }

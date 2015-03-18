@@ -180,6 +180,29 @@ public class TestRESTCallResponse
 
         Assert.fail( "'RESTCallNotYetPerformedException' expected." );
     }
+    
+    @Test
+    public void getResponseStatusMessage_Positive() throws Throwable
+    {
+        RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).get();
+        Assert.assertEquals( STATUS_MESSAGE, call.getResponseStatusMessage() );
+    }
+    
+    @Test
+    public void getResponseStatusMessage_NoCallPerformed()
+    {
+        try
+        {
+            new RESTCall().getResponseStatusMessage();
+        }
+        catch ( RESTCallNotYetPerformedException e )
+        {
+            Assert.assertThat( e.getMessage(), containsString( "getResponseStatusMessage()" ) );
+            return;
+        }
+
+        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+    }
 
     @Test
     public void getResponseHttpHeaders_Positive() throws Throwable
