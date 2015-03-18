@@ -1388,7 +1388,7 @@ public class RESTCall
     /**
      * Reads the global settings and applies them.
      */
-    private final void readGlobalSettings()
+    private void readGlobalSettings()
     {
         // Read regular global settings
         XltProperties globSettings = XltProperties.getInstance();
@@ -1399,11 +1399,15 @@ public class RESTCall
         this.basePath = globSettings.getProperty( "com.xceptance.xrt.basePath", this.basePath );
         this.resourcePath = globSettings.getProperty( "com.xceptance.xrt.resourcePath", this.resourcePath );
         this.fragment = globSettings.getProperty( "com.xceptance.xrt.fragment", this.fragment );
+        this.enableDefaultValidation = globSettings.getProperty( "com.xceptance.xrt.defaultValidation.enabled", this.enableDefaultValidation );
 
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
+        readGlobalMultiSingleProperties( "com.xceptance.xrt.queryParam.", this.queryParams );
         readGlobalListProperty( "com.xceptance.xrt.http.headers", this.httpHeaders );
+        readGlobalMultiSingleProperties("com.xceptance.xrt.http.header.", this.httpHeaders );
         readGlobalListProperty( "com.xceptance.xrt.placeholders", this.placeholders );
+        readGlobalMultiSingleProperties("com.xceptance.xrt.placeholder.", this.placeholders );
 
         // Read the HTTP method property
         String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method" );
@@ -1437,6 +1441,11 @@ public class RESTCall
         }
     }
 
+    private void readGlobalMultiSingleProperties( final String keyFragment, Map<String, String> propertyMap)
+    {
+        propertyMap.putAll( XltProperties.getInstance().getPropertiesForKey( keyFragment ) );
+    }
+    
     /**
      * Reads the global settings of a property that contains a list of key-value
      * pairs and stores them in the corresponding map.
@@ -1447,9 +1456,9 @@ public class RESTCall
      *            The map that needs to be filled with the key-value pairs of
      *            the property.
      */
-    private final void readGlobalListProperty( final String key, Map<String, String> propertyMap )
+    private void readGlobalListProperty( final String key, Map<String, String> propertyMap )
     {
-        String list = XltProperties.getInstance().getProperty( key );
+        String list = XltProperties.getInstance().getProperty( key );       
 
         // if no value was found for that property, skip next steps
         if ( list == null )
@@ -1465,7 +1474,7 @@ public class RESTCall
                 continue;
 
             // Add the key value pair to the property map.
-            propertyMap.put( keyValueArray[0], keyValueArray[1] );
+            propertyMap.put( keyValueArray[0].trim(), keyValueArray[1].trim() );
         }
     }
 
@@ -1476,7 +1485,7 @@ public class RESTCall
      * @param resourceDef
      *            A class that has the annotation {@link ResourceDefinition}.
      */
-    private final void readResourceDefinition( final Class<?> resourceDef )
+    private void readResourceDefinition( final Class<?> resourceDef )
     {
         ResourceDefinition def = resourceDef.getAnnotation( ResourceDefinition.class );
 
@@ -1532,7 +1541,7 @@ public class RESTCall
      * @param resourceDef
      *            A class that has the annotation {@link HttpMethodDefinition}.
      */
-    private final void readHttpMethodDefinition( final Class<?> resourceDef )
+    private void readHttpMethodDefinition( final Class<?> resourceDef )
     {
         HttpMethodDefinition def = resourceDef.getAnnotation( HttpMethodDefinition.class );
 
@@ -1550,7 +1559,7 @@ public class RESTCall
      * @param resourceDef
      *            A class that has the annotation {@link HttpHeaderDefinition}.
      */
-    private final void readHttpHeaderDefinition( final Class<?> resourceDef )
+    private void readHttpHeaderDefinition( final Class<?> resourceDef )
     {
         HttpHeaderDefinition def = resourceDef.getAnnotation( HttpHeaderDefinition.class );
 
@@ -1573,7 +1582,7 @@ public class RESTCall
      * @param resourceDef
      *            A class that has the annotation {@link PlaceholderDefinition}.
      */
-    private final void readPlaceholderDefinition( final Class<?> resourceDef )
+    private void readPlaceholderDefinition( final Class<?> resourceDef )
     {
         PlaceholderDefinition def = resourceDef.getAnnotation( PlaceholderDefinition.class );
 
@@ -1600,7 +1609,7 @@ public class RESTCall
      * @param resourceDef
      *            A class that has default validation methods.
      */
-    private final <T> void readValidators( final Class<T> resourceDef )
+    private <T> void readValidators( final Class<T> resourceDef )
     {
         // Check if the resource definition class implements default validation
         // methods (derived from AutoValidatable.java)
@@ -1627,7 +1636,7 @@ public class RESTCall
      * and calculation time. When the same RESTCall instance is used again the
      * cached response data needs to be cleared.
      */
-    private final void clearResponseCaches()
+    private void clearResponseCaches()
     {
         responseStatusCode = -1;
         responseStatusMessage = null;
@@ -1639,7 +1648,7 @@ public class RESTCall
      * Performs the default validation by looping through the list of
      * validators.
      */
-    private final void processValidators() throws Throwable
+    private void processValidators() throws Throwable
     {
         if ( enableDefaultValidation )
         {
@@ -1658,7 +1667,7 @@ public class RESTCall
      *            The url that needs to be processes. Should already be Url
      *            encoded.
      */
-    private final void splitUrl( final String url )
+    private void splitUrl( final String url )
     {
         // If there is no url or if it's an empty String abort without doing
         // anything
@@ -1838,7 +1847,7 @@ public class RESTCall
      *            The part of the Url after '?' and before '#'. Should already
      *            be Url encoded.
      */
-    private final void splitQueryString( final String queryString )
+    private void splitQueryString( final String queryString )
     {
         // Split the query string at the occurance of '&'. As a result we get
         // the key - value pairs of the quers parameters.
