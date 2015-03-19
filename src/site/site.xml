@@ -2,7 +2,7 @@
 <project name="Xceptance REST Test">
   <bannerLeft>
     <name>XRT</name>
-    <src>http://www.xceptance.com/tl_files/xceptance/images/xceptance-title-stripe-logo_neu.png</src>
+    <src>https://www.xceptance.com/images/xceptance-logo-transparent-202px.png</src>
     <href>http://www.xceptance.com/</href>
   </bannerLeft>
   

@@ -59,7 +59,8 @@ public class JSON
      * Gets a property of the JSON via a specified jsonPath and an optional
      * filter. This method uses the
      * {@link JsonPath#read(String, String, Filter...)} method. On details how
-     * to use the filter please see {@link code.google.com/p/json-path}.
+     * to use the filter please see <a
+     * href="http://code.google.com/p/json-path">JSON-Path documentation</a>.
      * 
      * @param jsonPath
      *            The jsonPath to the requested property.
@@ -80,7 +81,7 @@ public class JSON
      *            The jsonPath to the requested property.
      * @param filters
      *            Optional filters that allow to select certain items for lists.
-     *            
+     * 
      * @return <b>true</b> if the path to the property exists, <b>false</b> if
      *         not.
      */
