@@ -13,6 +13,14 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.api.util.XltProperties;
+import com.xceptance.xrt.annotation.DisableDefaultValidation;
+import com.xceptance.xrt.annotation.HttpHeader;
+import com.xceptance.xrt.annotation.HttpHeaderDefinition;
+import com.xceptance.xrt.annotation.HttpMethodDefinition;
+import com.xceptance.xrt.annotation.Placeholder;
+import com.xceptance.xrt.annotation.PlaceholderDefinition;
+import com.xceptance.xrt.annotation.QueryParameter;
+import com.xceptance.xrt.annotation.ResourceDefinition;
 import com.xceptance.xrt.document.JSON;
 
 /**
@@ -146,10 +154,11 @@ public class RESTCall
      * time and deleted when this instance is reused for another REST call.
      */
     private int responseStatusCode = -1;
-    
+
     /**
-     * The cache for the response status message is filled when requested the first
-     * time and deleted when this instance is reused for another REST call.
+     * The cache for the response status message is filled when requested the
+     * first time and deleted when this instance is reused for another REST
+     * call.
      */
     private String responseStatusMessage;
 
@@ -175,14 +184,15 @@ public class RESTCall
 
     /**
      * <p>
-     * Constructor that takes a resource definition as an argument. The resource
-     * definition overrides global settings but can be adjusted by public
+     * Constructor that takes resource definitions as an argument. The resource
+     * definitions override global settings but can be adjusted by public
      * setters.
      * </p>
      * <br/>
      * <p>
-     * A resource definition can be any class that uses any of the following
-     * definition annotations:
+     * A resource definition can be any class that implements the interface
+     * {@link AutoValidatable} or uses any of the following definition
+     * annotations:
      * </p>
      * <ul>
      * <li>{@link ResourceDefinition}</li>
@@ -190,18 +200,41 @@ public class RESTCall
      * <li>{@link HttpHeaderDefinition}</li>
      * </ul>
      * <p>
-     * Providing a class with non of the mentioned annotations has the same
-     * effect as calling the default constructor {@link #RESTCall() }.
+     * 
+     * Providing a class with non of the mentioned annotations or interface has
+     * the same effect as calling the default constructor {@link #RESTCall() }.
      * </p>
      * <br/>
      * 
-     * @param resourceDef
-     *            The class that provides default values for a REST resource.
+     * @param resourceDefs
+     *            Those classes that provide default values for a REST resource.
      */
-    public RESTCall( final Class<?> resourceDef )
+    public RESTCall( Class<?>... resourceDefs )
     {
         readGlobalSettings();
-        setDefinitionClass( resourceDef );
+
+        for ( Class<?> resourceDef : resourceDefs )
+            setDefinitionClass( resourceDef );
+    }
+
+    /**
+     * Constructor that allows to enable/disable default validation for the
+     * specified resource definition individually while setting it.
+     * 
+     * To understand what is considered a resource definition please read the
+     * documentation of {@link RESTCall#RESTCall(Class...)}.
+     * 
+     * @param resourceDef
+     *            The class that provides default values for a REST resource.
+     * @param enableDefaultValidation
+     *            Should be <b>true</b> to enable default validation for this
+     *            resource explicitly or <b>false</b> to disable this resource.
+     */
+    public RESTCall( Class<?> resourceDef, boolean enableDefaultValidation )
+    {
+        readGlobalSettings();
+
+        setDefinitionClass( resourceDef, enableDefaultValidation );
     }
 
     /**
@@ -579,20 +612,59 @@ public class RESTCall
      * </p>
      * <br/>
      * <p>
-     * A resource definition can be any class that uses any of the following
-     * definition annotations:
+     * A resource definition can be any class that implements the interface
+     * {@link AutoValidatable} or uses any of the following definition
+     * annotations:
      * </p>
      * <ul>
      * <li>{@link ResourceDefinition}</li>
      * <li>{@link HttpMethodDefinition}</li>
      * <li>{@link HttpHeaderDefinition}</li>
+     * <li>{@link PlaceholderDefinition}</li>
      * </ul>
      * <br/>
      * 
+     * Providing none of listed annotations or interfaces this method has no
+     * effect.
+     * 
      * @param resourceDef
      *            The class that provides default values for a REST resource.
+     * 
+     * @return The updated RESTCall instance.
      */
     public RESTCall setDefinitionClass( final Class<?> resourceDef )
+    {
+        if ( resourceDef.isAnnotationPresent( DisableDefaultValidation.class ) )
+            setDefinitionClass( resourceDef, false );
+        else
+            setDefinitionClass( resourceDef, true );
+
+        return this;
+    }
+
+    /**
+     * <p>
+     * Method that takes a resource definition and a default validation flag as
+     * arguments. The latter allows to enable/disable default validation for
+     * this resource individually.
+     * </p>
+     * <br/>
+     * <p>
+     * On further details which classes are considered a resource definition see
+     * {@link RESTCall#RESTCall(Class...)}.
+     * </p>
+     * 
+     * @param resourceDef
+     *            The class that provides default values for a REST resource.
+     * @param enableDefaultValidation
+     *            Should be <b>true</b> to enable default validation for this
+     *            resource explicitly or <b>false</b> to disable this resource.
+     * 
+     * @return The updated RESTCall instance.
+     * @see {@link RESTCall#defaultValidation(Class, boolean)
+
+     */
+    public RESTCall setDefinitionClass( final Class<?> resourceDef, boolean enableDefaultValidation )
     {
         // Do nothing if the class is null
         if ( resourceDef != null )
@@ -601,7 +673,9 @@ public class RESTCall
             readHttpMethodDefinition( resourceDef );
             readHttpHeaderDefinition( resourceDef );
             readPlaceholderDefinition( resourceDef );
-            readValidators( resourceDef );
+
+            if ( enableDefaultValidation )
+                readValidator( resourceDef );
         }
 
         return this;
@@ -1127,7 +1201,7 @@ public class RESTCall
         this.requestBody = requestBody;
         return put();
     }
-    
+
     /**
      * This method is similar to {@link #process()}. It overrides the setting
      * for the HTTP method with PATCH and performs the call.
@@ -1141,7 +1215,7 @@ public class RESTCall
         this.httpMethod = HttpMethod.PATCH;
         return process();
     }
-    
+
     /**
      * This method is similar to {@link #process()}. It overrides the setting
      * for the HTTP method with PATCH, sets the request body, and performs the
@@ -1284,7 +1358,7 @@ public class RESTCall
 
         return this.responseStatusCode;
     }
-    
+
     /**
      * Returns the response status code, e.g. 200 or 400. The REST call must be
      * performed before this method can return a status code. Otherwise a
@@ -1398,11 +1472,37 @@ public class RESTCall
 
         return this;
     }
-    
+
+    /**
+     * Allows to enable/disable default validation for the specified resource
+     * definition individually. In contrast to
+     * {@link RESTCall#setDefinitionClass(Class, boolean)} this method does not
+     * apply the settings of the REST definition class.
+     * 
+     * 
+     * @param resourceDef
+     *            The class that provides default values for a REST resource.
+     * @param enableDefaultValidation
+     *            Should be <b>true</b> to enable default validation for this
+     *            resource explicitly or <b>false</b> to disable this resource.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall defaultValidation( final Class<?> resourceDef, final boolean enableDefaultValidation )
+    {
+        if ( enableDefaultValidation )
+            readValidator( resourceDef );
+        else
+            removeValidator( resourceDef );
+
+        return this;
+    }
+
     /**
      * Returns whether default validation is enabled or not.
      * 
-     * @return <b>true</b> if default validation is enabled, <b>false</b> if not.
+     * @return <b>true</b> if default validation is enabled, <b>false</b> if
+     *         not.
      */
     public boolean isDefaultValidationEnabled()
     {
@@ -1427,15 +1527,16 @@ public class RESTCall
         this.basePath = globSettings.getProperty( "com.xceptance.xrt.basePath", this.basePath );
         this.resourcePath = globSettings.getProperty( "com.xceptance.xrt.resourcePath", this.resourcePath );
         this.fragment = globSettings.getProperty( "com.xceptance.xrt.fragment", this.fragment );
-        this.enableDefaultValidation = globSettings.getProperty( "com.xceptance.xrt.defaultValidation.enabled", this.enableDefaultValidation );
+        this.enableDefaultValidation = globSettings.getProperty( "com.xceptance.xrt.defaultValidation.enabled",
+                this.enableDefaultValidation );
 
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
         readGlobalMultiSingleProperties( "com.xceptance.xrt.queryParam.", this.queryParams );
         readGlobalListProperty( "com.xceptance.xrt.http.headers", this.httpHeaders );
-        readGlobalMultiSingleProperties("com.xceptance.xrt.http.header.", this.httpHeaders );
+        readGlobalMultiSingleProperties( "com.xceptance.xrt.http.header.", this.httpHeaders );
         readGlobalListProperty( "com.xceptance.xrt.placeholders", this.placeholders );
-        readGlobalMultiSingleProperties("com.xceptance.xrt.placeholder.", this.placeholders );
+        readGlobalMultiSingleProperties( "com.xceptance.xrt.placeholder.", this.placeholders );
 
         // Read the HTTP method property
         String httpMethod = globSettings.getProperty( "com.xceptance.xrt.http.method" );
@@ -1469,11 +1570,11 @@ public class RESTCall
         }
     }
 
-    private void readGlobalMultiSingleProperties( final String keyFragment, Map<String, String> propertyMap)
+    private void readGlobalMultiSingleProperties( final String keyFragment, Map<String, String> propertyMap )
     {
         propertyMap.putAll( XltProperties.getInstance().getPropertiesForKey( keyFragment ) );
     }
-    
+
     /**
      * Reads the global settings of a property that contains a list of key-value
      * pairs and stores them in the corresponding map.
@@ -1486,7 +1587,7 @@ public class RESTCall
      */
     private void readGlobalListProperty( final String key, Map<String, String> propertyMap )
     {
-        String list = XltProperties.getInstance().getProperty( key );       
+        String list = XltProperties.getInstance().getProperty( key );
 
         // if no value was found for that property, skip next steps
         if ( list == null )
@@ -1627,9 +1728,9 @@ public class RESTCall
     }
 
     /**
-     * Determines if a resource definition class was derived from @link
-     * {@link DefaultValidation}, creates an instance of the class, and stores
-     * it in a list for a later usage of the validators.
+     * Determines if a resource definition class was derived from
+     * {@link DisableDefaultValidation}, creates an instance of the class, and
+     * stores it in a list for a later usage of the validators.
      * 
      * @param <T>
      *            The type of the resource definition class.
@@ -1637,8 +1738,10 @@ public class RESTCall
      * @param resourceDef
      *            A class that has default validation methods.
      */
-    private <T> void readValidators( final Class<T> resourceDef )
+    private <T> void readValidator( final Class<T> resourceDef )
     {
+        // Check if resource definition class d
+
         // Check if the resource definition class implements default validation
         // methods (derived from AutoValidatable.java)
         if ( AutoValidatable.class.isAssignableFrom( resourceDef ) )
@@ -1654,6 +1757,24 @@ public class RESTCall
                     | IllegalArgumentException | InvocationTargetException e )
             {
                 XltLogger.runTimeLogger.error( "Default validation failed!\n" + e.toString() );
+            }
+        }
+    }
+
+    /**
+     * Removes a validator from the internal list.
+     * 
+     * @param resourceDef
+     *            A class that has default validation methods.
+     */
+    private void removeValidator( final Class<?> resourceDef )
+    {
+        for ( AutoValidatable val : defaultValidators )
+        {
+            if ( resourceDef.isInstance( val ) )
+            {
+                defaultValidators.remove( val );
+                return;
             }
         }
     }

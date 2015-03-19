@@ -2,6 +2,7 @@ package com.xceptance.xrt.validation;
 
 import com.xceptance.xrt.AutoValidatable;
 import com.xceptance.xrt.RESTCallValidator;
+import com.xceptance.xrt.annotation.DisableDefaultValidation;
 import com.xceptance.xrt.annotation.ResourceDefinition;
 
 /**
@@ -11,7 +12,8 @@ import com.xceptance.xrt.annotation.ResourceDefinition;
  * 
  */
 @ResourceDefinition( baseUrl = "www.xrt.com" )
-public class DefaultValidation_Correct implements AutoValidatable
+@DisableDefaultValidation
+public class DefaultValidation_Disabled2nd implements AutoValidatable
 {
     /**
      * Static test property that is changed by validation method.

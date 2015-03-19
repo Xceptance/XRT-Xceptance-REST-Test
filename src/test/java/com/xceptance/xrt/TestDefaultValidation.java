@@ -8,9 +8,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Assert;
+
+import static org.junit.Assert.*;
 
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
@@ -18,6 +18,8 @@ import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.validation.DefaultValidation_Correct;
 import com.xceptance.xrt.validation.DefaultValidation_CorrectStatusCode;
 import com.xceptance.xrt.validation.DefaultValidation_DerivedMethod;
+import com.xceptance.xrt.validation.DefaultValidation_Disabled;
+import com.xceptance.xrt.validation.DefaultValidation_Disabled2nd;
 
 /**
  * Unit tests for the method {@link RESTCall#processValidators()}.
@@ -61,24 +63,16 @@ public class TestDefaultValidation
      * to test the RESTCall without sending a request into the real world.
      */
     private XltRESTAction mockAction;
-    
+
     /**
-     * Define result dir to prevent timers.csv exceptions.
+     * Global property to enable/disable default validation.
      */
-    @BeforeClass
-    public static void setUpOnce()
-    {
-        XltProperties.getInstance().setProperty( "com.xceptance.xlt.result-dir", "tmp" );
-    }
-    
+    private final String GLOB_PROP = "com.xceptance.xrt.defaultValidation.enabled";
+
     /**
-     * Cleanup the timer output. 
+     * Convenience field for setting properties.
      */
-    @AfterClass
-    public static void tearDownFinally() throws Throwable
-    {
-        FileUtils.deleteDirectory( new File("tmp") );
-    }
+    private final String FALSE = Boolean.FALSE.toString();
 
     /**
      * Test setup. Creates the mocked action that needs to be used in every test
@@ -100,20 +94,37 @@ public class TestDefaultValidation
         // connection.
         mockAction = new XltRESTAction( new RESTCall() );
         mockAction.getWebClient().setWebConnection( connection );
+
+        // Define result dir to prevent timers.csv exceptions.
+        XltProperties.getInstance().setProperty( "com.xceptance.xlt.result-dir", "tmp" );
     }
-    
+
     @After
     public void tearDown() throws Throwable
     {
         // Clean up status fields in definition classes
         DefaultValidation_Correct.valPerformed = false;
         DefaultValidation_CorrectStatusCode.valStatusCode = "Not yet executed.";
+        DefaultValidation_Disabled.valPerformed = false;
+        DefaultValidation_Disabled2nd.valPerformed = false;
+
+        // Cleanup property changes
+        XltProperties.reset();
+    }
+
+    /**
+     * Cleanup the timer output.
+     */
+    @AfterClass
+    public static void tearDownFinally() throws Throwable
+    {
+        FileUtils.deleteDirectory( new File( "tmp" ) );
     }
 
     /****************************************************************************************
      ************************ Default Validation Tests **************************************
      ****************************************************************************************/
-   
+
     /**
      * <p>
      * Validates if the default validation methods are called.
@@ -125,7 +136,7 @@ public class TestDefaultValidation
     {
         new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction ).get();
 
-        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
+        assertTrue( DefaultValidation_Correct.valPerformed );
     }
 
     /**
@@ -141,8 +152,8 @@ public class TestDefaultValidation
         new RESTCall( DefaultValidation_Correct.class ).setDefinitionClass( DefaultValidation_CorrectStatusCode.class )
                 .setPreviousAction( mockAction ).get();
 
-        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
-        Assert.assertEquals( DefaultValidation_CorrectStatusCode.expValStatusCode + STATUS_CODE,
+        assertTrue( DefaultValidation_Correct.valPerformed );
+        assertEquals( DefaultValidation_CorrectStatusCode.expValStatusCode + STATUS_CODE,
                 DefaultValidation_CorrectStatusCode.valStatusCode );
     }
 
@@ -157,7 +168,7 @@ public class TestDefaultValidation
     {
         new RESTCall( DefaultValidation_DerivedMethod.class ).setPreviousAction( mockAction ).get();
 
-        Assert.assertTrue( DefaultValidation_DerivedMethod.valPerformed );
+        assertTrue( DefaultValidation_DerivedMethod.valPerformed );
     }
 
     /**
@@ -171,14 +182,13 @@ public class TestDefaultValidation
     {
         RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
 
-        Assert.assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
         call.defaultValidation( true );
-        Assert.assertTrue( "Default validation should be enabled after using setter.",
-                call.isDefaultValidationEnabled() );
+        assertTrue( "Default validation should be enabled after using setter.", call.isDefaultValidationEnabled() );
 
         call.get();
 
-        Assert.assertTrue( DefaultValidation_Correct.valPerformed );
+        assertTrue( DefaultValidation_Correct.valPerformed );
     }
 
     /**
@@ -188,16 +198,231 @@ public class TestDefaultValidation
      * @throws Throwable
      */
     @Test
-    public void disableDefaultValidation() throws Throwable
+    public void disable4RESTCall() throws Throwable
     {
         RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
-        
-        Assert.assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
         call.defaultValidation( false );
-        Assert.assertFalse( "Default validation should be disabled after using setter.", call.isDefaultValidationEnabled() );
-        
+        assertFalse( "Default validation should be disabled after using setter.", call.isDefaultValidationEnabled() );
+
         call.get();
 
-        Assert.assertFalse( DefaultValidation_Correct.valPerformed );
+        assertFalse( DefaultValidation_Correct.valPerformed );
+    }
+
+    /**
+     * Default validation can be disabled via global setting in *.properties
+     * file.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableGlobally() throws Throwable
+    {
+        // Disable default validation globally via property
+        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+
+        // Perform call
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
+
+        assertFalse( "Default validation should be disabled after using setter.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertFalse( DefaultValidation_Correct.valPerformed );
+    }
+
+    /**
+     * Override of global setting by {@link RESTCall#defaultValidation(boolean)}
+     * .
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void overrideGlobalSettingByRESTCall() throws Throwable
+    {
+        // Disable default validation globally via property
+        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+
+        // Perform call
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
+
+        // Override global setting on RESTCall level
+        assertFalse( "Default validation should be disabled after using setter.", call.isDefaultValidationEnabled() );
+        call.defaultValidation( true );
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertTrue( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+    }
+
+    /**
+     * Default validation can be disabled for a single resource definition only.
+     * All other definitions should have their default validation enabled.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableByResourceDef() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class, DefaultValidation_Disabled.class )
+                .setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertTrue( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+        assertFalse( "DefaultValidation_Disabled: performed.", DefaultValidation_Disabled.valPerformed );
+    }
+
+    /**
+     * Disabled default validation in resource definition cannot be overridden
+     * by {@link RESTCall#defaultValidation(boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableByResourceDefNoOverrideByRESTCall() throws Throwable
+    {
+        // Disable default validation globally via property
+        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+
+        // Perform call
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class, DefaultValidation_Disabled.class )
+                .setPreviousAction( mockAction );
+
+        // Override global setting on RESTCall level
+        assertFalse( "Default validation should be disabled.", call.isDefaultValidationEnabled() );
+        call.defaultValidation( true );
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertTrue( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+        assertFalse( "DefaultValidation_Disabled: performed.", DefaultValidation_Disabled.valPerformed );
+    }
+
+    /**
+     * A disabled default validation at resource definition level can be enabled
+     * via {@link RESTCall#RESTCall(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void enableDisabledResourceDefByRESTCall_Constructor() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Disabled.class, true ).setDefinitionClass(
+                DefaultValidation_Disabled2nd.class ).setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertTrue( "DefaultValidation_Disabled: not performed.", DefaultValidation_Disabled.valPerformed );
+        assertFalse( "DefaultValidation_Disabled2nd: performed.", DefaultValidation_Disabled2nd.valPerformed );
+    }
+
+    /**
+     * A disabled default validation at resource definition level can be enabled
+     * via {@link RESTCall#setDefinitionClass(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void enableDisabledResourceDefByRESTCall_Method() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Disabled2nd.class ).setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.setDefinitionClass( DefaultValidation_Disabled.class, true ).get();
+
+        assertTrue( "DefaultValidation_Disabled: not performed.", DefaultValidation_Disabled.valPerformed );
+        assertFalse( "DefaultValidation_Disabled2nd: performed.", DefaultValidation_Disabled2nd.valPerformed );
+    }
+
+    /**
+     * A disabled default validation at resource definition level can be enabled
+     * via {@link RESTCall#defaultValidation(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void enableDisabledResourceDefByRESTCall_Method2() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Disabled.class, DefaultValidation_Disabled2nd.class )
+                .setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.defaultValidation( DefaultValidation_Disabled.class, true ).get();
+
+        assertTrue( "DefaultValidation_Disabled: not performed.", DefaultValidation_Disabled.valPerformed );
+        assertFalse( "DefaultValidation_Disabled2nd: performed.", DefaultValidation_Disabled2nd.valPerformed );
+    }
+
+    /**
+     * An enabled default validation at resource definition level can be
+     * disabled via {@link RESTCall#RESTCall(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableEnabledResourceDefByRESTCall_Constructor() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class, false ).setDefinitionClass(
+                DefaultValidation_CorrectStatusCode.class ).setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.get();
+
+        assertFalse( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+        assertEquals( "DefaultValidation_Disabled: performed.", DefaultValidation_CorrectStatusCode.expValStatusCode
+                + STATUS_CODE, DefaultValidation_CorrectStatusCode.valStatusCode );
+    }
+
+    /**
+     * An enabled default validation at resource definition level can be
+     * disabled via {@link RESTCall#setDefinitionClass(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableEnabledResourceDefByRESTCall_Method() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_CorrectStatusCode.class ).setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.setDefinitionClass( DefaultValidation_Correct.class, false ).get();
+
+        assertFalse( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+        assertEquals( "DefaultValidation_Disabled: performed.", DefaultValidation_CorrectStatusCode.expValStatusCode
+                + STATUS_CODE, DefaultValidation_CorrectStatusCode.valStatusCode );
+    }
+
+    /**
+     * An enabled default validation at resource definition level can be
+     * disabled via {@link RESTCall#defaultValidation(Class, boolean)}.
+     * 
+     * @throws Throwable
+     */
+    @Test
+    public void disableEnabledResourceDefByRESTCall_Method2() throws Throwable
+    {
+        RESTCall call = new RESTCall( DefaultValidation_Correct.class, DefaultValidation_CorrectStatusCode.class )
+                .setPreviousAction( mockAction );
+
+        assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+
+        call.defaultValidation( DefaultValidation_Correct.class, false ).get();
+
+        assertFalse( "DefaultValidation_Correct: not performed.", DefaultValidation_Correct.valPerformed );
+        assertEquals( "DefaultValidation_Disabled: performed.", DefaultValidation_CorrectStatusCode.expValStatusCode
+                + STATUS_CODE, DefaultValidation_CorrectStatusCode.valStatusCode );
     }
 }
