@@ -32,10 +32,6 @@ import com.xceptance.xrt.document.JSON;
  */
 public class RESTCall
 {
-    // TODO Url encoding
-    // TODO Add support for the HTTP method PATCH. Override
-    // com.gargoylesoftware.htmlunit.HttpMethod
-
     /****************************************************************************************
      ************************ Private Properties ********************************************
      ****************************************************************************************/
