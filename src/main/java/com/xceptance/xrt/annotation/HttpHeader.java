@@ -1,4 +1,4 @@
-package com.xceptance.xrt;
+package com.xceptance.xrt.annotation;
 
 /**
  * A HTTP header used to define a default setting for a REST resource.

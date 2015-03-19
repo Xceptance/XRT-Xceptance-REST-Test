@@ -1,4 +1,4 @@
-package com.xceptance.xrt;
+package com.xceptance.xrt.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,19 +6,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that defines the default list of placeholders and their values.
+ * Annotation that defines the default HTTP headers to call a REST resource.
  * 
  * @author Patrick Thaele
  *
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
-public @interface PlaceholderDefinition
+public @interface HttpHeaderDefinition
 {
     /**
-     * The default placeholders and their values of the REST resource.
+     * The default HTTP parameters of the REST resource.
      * 
-     * @return An array of placeholders.
+     * @return An array of HTTP parameters.
      */
-    Placeholder[] value() default {};
+    HttpHeader[] value() default {};
 }

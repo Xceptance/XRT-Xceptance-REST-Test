@@ -1,4 +1,4 @@
-package com.xceptance.xrt;
+package com.xceptance.xrt.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

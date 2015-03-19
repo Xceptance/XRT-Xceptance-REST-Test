@@ -7,6 +7,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.xceptance.xrt.annotation.HttpHeader;
+import com.xceptance.xrt.annotation.HttpHeaderDefinition;
+import com.xceptance.xrt.annotation.HttpMethodDefinition;
+import com.xceptance.xrt.annotation.QueryParameter;
+import com.xceptance.xrt.annotation.ResourceDefinition;
 
 /**
  * <p>

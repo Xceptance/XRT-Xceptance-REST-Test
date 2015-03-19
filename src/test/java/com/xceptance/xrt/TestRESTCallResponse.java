@@ -76,6 +76,9 @@ public class TestRESTCallResponse
         XltProperties.getInstance().setProperty( "com.xceptance.xlt.result-dir", "tmp" );
     }
     
+    /**
+     * Cleanup the timer output. 
+     */
     @AfterClass
     public static void tearDownFinally() throws Throwable
     {

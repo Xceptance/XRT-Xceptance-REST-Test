@@ -1,4 +1,4 @@
-package com.xceptance.xrt;
+package com.xceptance.xrt.annotation;
 
 /**
  * <p>The query parameter inside an URL used to define a default setting for a REST
