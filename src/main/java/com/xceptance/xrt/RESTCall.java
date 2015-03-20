@@ -661,7 +661,7 @@ public class RESTCall
      *            resource explicitly or <b>false</b> to disable this resource.
      * 
      * @return The updated RESTCall instance.
-     * @see {@link RESTCall#defaultValidation(Class, boolean)
+     * @see RESTCall#defaultValidation(Class, boolean)
 
      */
     public RESTCall setDefinitionClass( final Class<?> resourceDef, boolean enableDefaultValidation )

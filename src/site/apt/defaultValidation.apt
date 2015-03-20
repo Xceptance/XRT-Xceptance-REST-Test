@@ -17,8 +17,7 @@ Default Validation
  default validation.
  
  You can include default validation in your REST call definition classes 
- just by providing the following <static> methods. The lookup of these methods
- is done via Java Reflection.
+ just by implementing the interface AutoValidatable.
 
 +---------------
 /**
@@ -26,46 +25,13 @@ Default Validation
 */
 @ResourceDefinition( actionName="test action", resourcePath = "myResource" )
 @HttpMethodDefinition( HttpMethod.GET )
-public abstract class ExampleClazz
+public abstract class ExampleClazz implements AutoValidatable
 {
-	/**
-	* Allows to validate the status code of the REST call response.
-	*
-	* @param statusCode The status code returned by the REST call, e.g. 200 or 404.
-	*/
-	public static void validateStatusCode( final int statusCode )
+	@override
+	public void validate( RESTCallValidator call )
 	{
-		// Your validation code here.
-	}
-	
-	/**
-	* Allows to validate the response HTTP headers of the REST call.
-	*
-	* @param headerList The list of the response HTTP headers, e.g. "Content-Type".
-	*/
-	public static void validateResponseHeaders( final List<NameValuePair> headerList )
-	{
-		// Your validation code here.
-	}
-	
-	/**
-	* Allows to validate the response body of the REST call.
-	*
-	* @param body The body of the response as String.
-	*/
-	public static void validateResponseBody( final String body )
-	{
-		// Your validation code here.
-	}
-	
-	/**
-	* Allows to validate the response body of the REST call.
-	*
-	* @param body The body of the response as JSON.
-	*/
-	public static void validateResponseBody( final JSON body )
-	{
-		// Your validation code here.
+		// Sample validation code
+		assertEquals( 200, call.getResponseStatusCode() );
 	}
 }
 +---------------
@@ -74,20 +40,57 @@ public abstract class ExampleClazz
 
  Several resource definition classes can have different default validation methods. When
  you apply several of them at a REST call instance all of them are performed after the REST
- call was performed. That means for example that <<validateResponseHeaders()>> can be 
- performed several times. But that also allows to have resource definition classes exclusively 
+ call was performed. That also allows to have resource definition classes exclusively 
  for validation.
  
-* Disable Default Validation at RESTCall Level
+* Disable Default Validation
 
  In certain situations you might need to disable default validation. The RESTCall class
- provides methods to overcome these situations:
+ provides a method to overcome these situations. Note that the following method can override the global settings.
  
 +---------------
-RESTCall.defaultValidation( boolean );
-RESTCall.defaultResponseCodeValidation( boolean );
-RESTCall.defaultResponseHeaderValidation( boolean );
-RESTCall.defaultResponseBodyValidation( boolean ); 
-+--------------
+RESTCall.defaultValidation( false );
++---------------
+ 
+ It's even possible to enable/disable default validation for certain definition classes via these methods:
+
++---------------
+// Creates a new RESTCall instance with default validation disabled for the provided definition class.
+RESTCall call = new RESTCall( ExampleClazz.class, false ); 
+
+// Disables default validation for a second resource definition
+call.setDefinitionClass( SecondExampleClazz.class, false );
+
+// Enable disabled default validation for a single resource definition
+call.defaultValidation( ExampleClazz.class, true );
++---------------
+
+ These methods remove or add a resource definition from the list of elements where default validation should be applied.
+ You will see the same effect by providing the class annotation @DisableDefaultValidation at resource definition level:
+
++---------------
+/**
+* The REST call definition class.
+*/
+@ResourceDefinition( actionName="test action", resourcePath = "myResource" )
+@HttpMethodDefinition( HttpMethod.GET )
+@DisableDefaultValidation
+public abstract class ExampleClazz implements AutoValidatable
+{
+	@override
+	public void validate( RESTCallValidator call )
+	{
+		// Sample validation code no longer executed
+		...
+	}
+}
++---------------
+
+ Default validation also can be disabled via global settings:
+ 
++---------------
+com.xceptance.xrt.defaultValidation.enabled=false
++---------------
+
  
  For more information please read the JavaDoc of the RESTCall class.

@@ -7,3 +7,64 @@
 
 
 Templating of REST Calls  
+
+ Defining RESTCall instances by using its huge amount of methods is one way to make a REST call. But if you 
+ have to perform the same call over and over again, e.g. in your load test script, it might become handy to 
+ have a template that can be used over and over again.
+
+* Resource Definition Class
+
+ The following class can be used as a template for a REST call.
+
++-------------------
+@ResourceDefinition( protocol = "https", baseUrl = "my.url.test.com", port = 8080, basePath = "base/path", resourcePath = "resource", 
+    queryParams = { @QueryParameter( name = "param1", value = "foo" ), @QueryParameter( name = "param2", value = "bar" ) }, 
+    fragment = "fragment" )
+@HttpMethodDefinition( HttpMethod.POST )
+@HttpHeaderDefinition( { @HttpHeader( name = "hname", value = "hvalue" ), @HttpHeader( name= "hname2", value = "hvalue2" )})
+class DefinitionClazz
+{
+}
++-------------------
+
+ Using the template above will create the following URL:
+ https://my.url.test.com:8080/base/path/resource?param1=foo&param2=bar#fragement
+
+ The call will use POST as HTTP method and "hname:hvalue" and "hname2:hvalue2" as HTTP headers.
+
+ All properties are optional and can be overridden by the RESTCall instance. That allows you to write a 
+ template for a resource path and a query parameter but the rest of the URL can be defined in global settings 
+ or directly at RESTCall level.
+
+
+* Using Resource Definition Classes in a RESTCall
+
+ Several of these classes can be added to a RESTCall instance by using one of two ways:
+ 
++-------------------
+// 1) Use the constructor
+RESTCall call = new RESTCall( DefinitionClazz.class );
+
+// 2) Use a setter
+call.setDefinitionClass( SecondDefinitionClazz.class );
++-------------------
+
+ As you can see above it's also possible to set several of these classes. This is possible because a second class adds 
+ its settings to the already existing ones.  For example could look as follows:
+
++-------------------
+@ResourceDefinition( port = 1234, queryParams = { @QueryParameter( name = "newParam", value = "newValue")} )
+@HttpHeaderDefinition( @HttpHeader( name = "newHeader", value = "newValue" ))
+class SecondDefinitionClazz
+{
+}
++-------------------
+
+ This definition class would update the port to "1234" and would add a new query parameter and a new HTTP header. The resulting URL would look like this:
+
+ https://my.url.test.com:1234/base/path/resource?param1=foo&param2=bar&newParam=newValue#fragement
+
+ The call would be performed via POST and the headers "hname:hvalue", "hname2:hvalue2", and "newHeader:newValue".
+
+
+ You can add as many resource defintions to a RESTCall instance as you wish. The latest setting will be active.

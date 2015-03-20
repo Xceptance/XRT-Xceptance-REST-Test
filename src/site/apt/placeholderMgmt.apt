@@ -1,0 +1,79 @@
+ ------------------------
+ Placeholder Management
+ --------------
+ Patrick Thaele
+ ----------
+ 2015-03-20
+ 
+Placeholder Management
+ 
+ In XRT it's possible to define placeholders that are replaced by the RESTCall instance before the call is processed. This
+ makes resource definition classes (templates) even more flexible. Please have a look at the following example:
+ 
++----------------------------
+@ResourceDefinition( baseUrl = "my.url.test.com", resourcePath = "product/${id}" ) 
+class DefinitionClazz
+{
+}
++----------------------------
+ 
++----------------------------
+String productId = getProductId();
+
+RESTCall call = new RESTCall( DefinitionClazz.class );
+call.addPlaceholderValue( "id", productId );
+call.get();
++----------------------------
+
+* Defining Placeholders
+  
+  Placeholders are defined by writing the name surrounded by "$\{" and "\}", e.g. "$\{placeholdername\}.
+  As can be seen in the example "resourcePath" defines the placeholder "id". Basically every setting that is a String
+  is allowed to have placeholders.
+  
+* Defining Placeholder Values
+ 
+  You can define placeholder values on 3 different levels.
+  
+** Global Level
+ 
+ You can define placeholder values in a \*.properties file as follows:
+
++----------------------------
+### Placeholder definitions can be defined in 2 different ways
+### 1) List
+com.xceptance.xrt.placeholders = ph1:value1,ph2:value2
+### 2) Single items - 2) overrides settings of 1)
+com.xceptance.xrt.placeholder.ph2=valueX
+com.xceptance.xrt.placeholder.ph3=value3
+com.xceptance.xrt.placeholder.ph4=value4
++----------------------------
+
+ That way you can define default values for placeholders that can be overriden by the 2 other levels.
+ 
+** Resource Definition Level
+  
+ To define placeholder values XRT also provides a small set of annotations:
+ 
++----------------------------
+@ResourceDefinition( baseUrl = "my.url.test.com", resourcePath = "product/${id}" )
+@PlaceholderDefinition( { @Placeholder( name = "id", value = "some_id" ), @Placeholder( name = "phName", value = "phValue" )})
+class DefinitionClazz
+{
+}
++----------------------------  
+
+ Now the placeholder "$\{id\}" will be overriden by the value "some_id". That means the "resourcePath" is now "product/some_id".
+ The placeholder still can be overriden on RESTCall level. 
+
+** RESTCall Level
+ 
+ As everything you also can add/override placeholder values at RESTCall level as the following example shows:
+
++----------------------------
+RESTCall call = new RESTCall( DefinitionClazz.class );
+call.addPlaceholderValue( "id", "different_id" );
+
+// You also can remove placeholder values
+call.removePlaceholderValue( "phName" );
++----------------------------     
