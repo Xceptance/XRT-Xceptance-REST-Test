@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.xceptance</groupId>
   <artifactId>xrt</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>Xceptance REST Test</name>
   <description>Test Framework for REST APIs</description>
   <url>http://www.xceptance.com/</url>
