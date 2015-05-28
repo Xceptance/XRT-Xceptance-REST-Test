@@ -78,12 +78,8 @@ public class XltRESTAction extends AbstractLightWeightPageAction
             request.setRequestBody( requestBody );
         }
 
-        // Make the call.
-        LightWeightPage page = ( (XltWebClient) getWebClient() ).getLightWeightPage( request );
-        setLightWeightPage( page );
-
-        // Store the response and the previous action.
-        WebResponse response = page.getWebResponse();
+        // Make the call and store the response and previous action.
+        WebResponse response = getWebClient().loadWebResponse( request );
         restCall.setRESTResponse( response );
         restCall.setPreviousAction( this );
 
