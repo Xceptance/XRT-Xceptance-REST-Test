@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.xceptance.xlt.api.engine.Session;
+import com.xceptance.xlt.api.engine.SessionShutdownListener;
 import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.annotation.DisableDefaultValidation;
@@ -45,7 +47,8 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * Implements an automatic approach for action handling.
+     * Implements an automatic approach for action handling. Is set to null in
+     * {@link RESTCall#init()} when session dies at the end of a test case.
      */
     private static ThreadLocal<XltRESTAction> prevAction = new ThreadLocal<>();
 
@@ -179,7 +182,7 @@ public class RESTCall
      */
     public RESTCall()
     {
-        readGlobalSettings();
+        init();
     }
 
     /**
@@ -211,7 +214,7 @@ public class RESTCall
      */
     public RESTCall( Class<?>... resourceDefs )
     {
-        readGlobalSettings();
+        init();
 
         for ( Class<?> resourceDef : resourceDefs )
             setDefinitionClass( resourceDef );
@@ -232,7 +235,7 @@ public class RESTCall
      */
     public RESTCall( Class<?> resourceDef, boolean enableDefaultValidation )
     {
-        readGlobalSettings();
+        init();
 
         setDefinitionClass( resourceDef, enableDefaultValidation );
     }
@@ -247,7 +250,7 @@ public class RESTCall
      */
     public RESTCall( final String url )
     {
-        readGlobalSettings();
+        init();
 
         splitUrl( url );
     }
@@ -662,7 +665,6 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * @see RESTCall#defaultValidation(Class, boolean)
-
      */
     public RESTCall setDefinitionClass( final Class<?> resourceDef, boolean enableDefaultValidation )
     {
@@ -1512,6 +1514,27 @@ public class RESTCall
     /****************************************************************************************
      ************************ Private Methods ***********************************************
      ****************************************************************************************/
+
+    /**
+     * Performs necessary steps to initialize the RESTCall class.
+     */
+    private void init()
+    {
+        // Register listener to delete previous action when session dies
+        if ( getPreviousAction() == null )
+        {
+            Session.getCurrent().addShutdownListener( new SessionShutdownListener()
+            {
+                @Override
+                public void shutdown()
+                {
+                    setPreviousAction( null );
+                }
+            } );
+        }
+
+        readGlobalSettings();
+    }
 
     /**
      * Reads the global settings and applies them.
