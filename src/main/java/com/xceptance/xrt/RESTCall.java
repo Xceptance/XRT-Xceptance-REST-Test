@@ -1119,6 +1119,9 @@ public class RESTCall
      */
     public RESTCall process() throws Throwable
     {
+        if(this.httpMethod.equals( HttpMethod.PATCH ))
+            throw new NotYetImplementedException("HTTP method 'PATCH' is not yet supported.");
+        
         clearResponseCaches();
         new XltRESTAction( this ).run();
         processValidators();
