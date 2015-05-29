@@ -5,9 +5,7 @@ import java.net.URL;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.xceptance.xlt.api.actions.AbstractLightWeightPageAction;
-import com.xceptance.xlt.api.htmlunit.LightWeightPage;
 import com.xceptance.xlt.api.util.XltLogger;
-import com.xceptance.xlt.engine.XltWebClient;
 
 /**
  * This class performs the REST call as configured in the REST call instance.
@@ -77,6 +75,9 @@ public class XltRESTAction extends AbstractLightWeightPageAction
 
             request.setRequestBody( requestBody );
         }
+        
+        // Avoid caching of REST documents
+        request.setDocumentRequest();
 
         // Make the call and store the response and previous action.
         WebResponse response = getWebClient().loadWebResponse( request );
