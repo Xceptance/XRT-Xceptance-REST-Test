@@ -1,9 +1,8 @@
 package com.xceptance.xrt.document;
 
-import junit.framework.Assert;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Assert;
 
 /**
  * Verifies all custom methods of @link {@link JSON}. Methods that only work as
