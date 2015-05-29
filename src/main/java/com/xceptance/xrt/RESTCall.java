@@ -1567,6 +1567,9 @@ public class RESTCall
             case "trace":
                 this.httpMethod = HttpMethod.TRACE;
                 break;
+            case "patch":
+                this.httpMethod = HttpMethod.PATCH;
+                break;
         }
     }
 
