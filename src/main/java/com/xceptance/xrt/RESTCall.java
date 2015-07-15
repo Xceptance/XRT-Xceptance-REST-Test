@@ -1119,9 +1119,6 @@ public class RESTCall
      */
     public RESTCall process() throws Throwable
     {
-        if(this.httpMethod.equals( HttpMethod.PATCH ))
-            throw new NotYetImplementedException("HTTP method 'PATCH' is not yet supported.");
-        
         clearResponseCaches();
         new XltRESTAction( this ).run();
         processValidators();
@@ -1217,8 +1214,7 @@ public class RESTCall
      */
     public RESTCall patch() throws Throwable
     {
-        this.httpMethod = HttpMethod.PATCH;
-        return process();
+        throw new NotYetImplementedException("HTTP method 'PATCH' is not yet supported.");
     }
 
     /**
@@ -1592,9 +1588,6 @@ public class RESTCall
                 break;
             case "trace":
                 this.httpMethod = HttpMethod.TRACE;
-                break;
-            case "patch":
-                this.httpMethod = HttpMethod.PATCH;
                 break;
         }
     }

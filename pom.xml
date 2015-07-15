@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.xceptance</groupId>
   <artifactId>xrt</artifactId>
-  <version>1.0.2-alpha1</version>
+  <version>1.0.2-alpha2</version>
   <name>Xceptance REST Test</name>
   <description>Test Framework for REST APIs</description>
   <url>http://www.xceptance.com/</url>
@@ -78,11 +78,18 @@
     </plugins>
   </reporting>
   
+    <repositories>
+        <repository>
+            <id>xc-nexus</id>
+            <url>https://lab.xceptance.de/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+  
   <dependencies>
     <dependency>
       <groupId>com.xceptance</groupId>
       <artifactId>xlt</artifactId>
-      <version>4.5.4</version>
+      <version>4.5.5</version>
     </dependency>
     
     <dependency>
