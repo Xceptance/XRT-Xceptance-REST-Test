@@ -30,12 +30,12 @@ import com.xceptance.xrt.document.JSON;
  * Performs a REST call based on the information retrieved from its internal and
  * global settings.
  * </p>
- * <br/>
+ * <br>
  * <p>
  * All writing methods return the updated instance to ensure an efficient
  * configuration of the REST call.
  * </p>
- * <br/>
+ * <br>
  * 
  * @author Patrick Thaele
  * 
@@ -191,7 +191,7 @@ public class RESTCall
      * definitions override global settings but can be adjusted by public
      * setters.
      * </p>
-     * <br/>
+     * <br>
      * <p>
      * A resource definition can be any class that implements the interface
      * {@link AutoValidatable} or uses any of the following definition
@@ -207,7 +207,7 @@ public class RESTCall
      * Providing a class with non of the mentioned annotations or interface has
      * the same effect as calling the default constructor {@link #RESTCall() }.
      * </p>
-     * <br/>
+     * <br>
      * 
      * @param resourceDefs
      *            Those classes that provide default values for a REST resource.
@@ -613,7 +613,7 @@ public class RESTCall
      * definition overrides global settings but can be adjusted by public
      * setters.
      * </p>
-     * <br/>
+     * <br>
      * <p>
      * A resource definition can be any class that implements the interface
      * {@link AutoValidatable} or uses any of the following definition
@@ -625,7 +625,7 @@ public class RESTCall
      * <li>{@link HttpHeaderDefinition}</li>
      * <li>{@link PlaceholderDefinition}</li>
      * </ul>
-     * <br/>
+     * <br>
      * 
      * Providing none of listed annotations or interfaces this method has no
      * effect.
@@ -651,7 +651,7 @@ public class RESTCall
      * arguments. The latter allows to enable/disable default validation for
      * this resource individually.
      * </p>
-     * <br/>
+     * <br>
      * <p>
      * On further details which classes are considered a resource definition see
      * {@link RESTCall#RESTCall(Class...)}.
@@ -690,6 +690,7 @@ public class RESTCall
      * 
      * @param url
      *            The Url used for the REST call.
+     * @return The updated RESTCall instance.
      */
     public RESTCall setUrl( final String url )
     {
@@ -923,23 +924,23 @@ public class RESTCall
      * contain a placeholder that is replaced by a value right before the REST
      * call is performed. Here is an example:
      * </p>
-     * <br/>
+     * <br>
      * 
      * <p>
      * <i>anyhost.com/base/path/resource/${id}?query=value</i>
      * </p>
-     * <br/>
+     * <br>
      * 
      * <p>
      * If the REST call instance knows about the placeholder, this can be
      * replaced:
      * </p>
-     * <br/>
+     * <br>
      * <p>
-     * <i>id:foobar => anyhost.com/base/path/resource/foobar?query=value</i>
+     * <i>id:foobar turns the url into anyhost.com/base/path/resource/foobar?query=value</i>
      * </p>
      * 
-     * <br/>
+     * <br>
      * <p>
      * This method adds/updates a placeholder value to the REST call
      * configuration. Since placeholders must be unique the new placeholder
@@ -1115,7 +1116,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall process() throws Throwable
     {
@@ -1132,7 +1133,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall get() throws Throwable
     {
@@ -1146,7 +1147,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall post() throws Throwable
     {
@@ -1164,7 +1165,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall post( final String requestBody ) throws Throwable
     {
@@ -1178,7 +1179,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall put() throws Throwable
     {
@@ -1196,7 +1197,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall put( final String requestBody ) throws Throwable
     {
@@ -1210,7 +1211,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall patch() throws Throwable
     {
@@ -1228,7 +1229,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall patch( final String requestBody ) throws Throwable
     {
@@ -1242,7 +1243,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall delete() throws Throwable
     {
@@ -1256,7 +1257,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall head() throws Throwable
     {
@@ -1270,7 +1271,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall options() throws Throwable
     {
@@ -1284,7 +1285,7 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable
+     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
      */
     public RESTCall trace() throws Throwable
     {
@@ -1444,7 +1445,7 @@ public class RESTCall
      * same effect can be achieved by calling the method
      * {@link #getResponseHttpHeader(String)}.
      * </p>
-     * <br/>
+     * <br>
      * <p>
      * The REST call must be performed before this method can return a status
      * code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
@@ -1823,7 +1824,7 @@ public class RESTCall
      * Performs the default validation by looping through the list of
      * validators.
      */
-    private void processValidators() throws Throwable
+    private void processValidators()
     {
         if ( enableDefaultValidation )
         {

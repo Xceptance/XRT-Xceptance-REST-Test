@@ -15,7 +15,8 @@ Global Settings
  
 +----------------------
 ### Expected URL:
-### https://www.xrt.com:8080/rest/value1/valueX/value3/value4/resource/subresource?qp1=val1&qp2=val2&qp3=val3&qp4=val4&qp5=val5#fragment
+### https://www.xrt.com:8080/rest/value1/valueX/value3/value4/resource/subresource
+###     ?qp1=val1&qp2=val2&qp3=val3&qp4=val4&qp5=val5#fragment
 ### Expected HTTP method:
 ### POST
 ### Expected HTTP headers:

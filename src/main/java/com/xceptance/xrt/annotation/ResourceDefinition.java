@@ -10,17 +10,21 @@ import java.lang.annotation.Target;
  * Annotation that defines the default Url to call a REST resource. The
  * following example shows which settings can be done to create a REST URL:
  * </p>
- * <br/>
+ * <br>
  * 
  * <pre>
+ * {@code
  * {baseUrl}/{basePath}/{resourcePath}?{queryParam1}&{queryParam2}#{fragment}
+ * }
  * </pre>
  * <p>
  * A concrete example could look like this:
  * </p>
  * 
  * <pre>
- * https://valid.host.com:433/base/path/resource?foo=bar&foo2=bar2#fragment
+ * {@code
+ * https://valid.host.com:433/base/path/resource?foo=bar&foo2=bar2#fragment;
+ * }
  * </pre>
  * 
  * @author Patrick Thaele
@@ -69,7 +73,7 @@ public @interface ResourceDefinition
      * }
      * </pre>
      * 
-     * <br/>
+     * <br>
      * 
      * <p>
      * Since <b>http</b> and <b>port 80</b> are the default values ( if nothing
@@ -83,7 +87,7 @@ public @interface ResourceDefinition
      * }
      * </pre>
      * 
-     * <br/>
+     * <br>
      * 
      * @return The default base Url of the resource.
      */

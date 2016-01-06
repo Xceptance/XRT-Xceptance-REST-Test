@@ -62,6 +62,8 @@ public class JSON
      * to use the filter please see <a
      * href="http://code.google.com/p/json-path">JSON-Path documentation</a>.
      * 
+     * @param <T>
+     *            Auto calculated return type.
      * @param jsonPath
      *            The jsonPath to the requested property.
      * @param filters
@@ -121,6 +123,8 @@ public class JSON
      * expected value. If they are not, an {@link java.lang.AssertionError
      * AssertionError} is thrown.
      * 
+     * @param <T>
+     *            Auto calculated return type.
      * @param expected
      *            The expected value.
      * @param path
@@ -139,6 +143,8 @@ public class JSON
      * expected value. If they are not, an {@link java.lang.AssertionError
      * AssertionError} with the given message is thrown.
      * 
+     * @param <T>
+     *            Auto calculated return type.
      * @param message
      *            The message of the {@link java.lang.AssertionError
      *            AssertionError} if the assert fails.
@@ -265,8 +271,8 @@ public class JSON
      * condition specified by the matcher. If the assert fails an
      * {@link java.lang.AssertionError AssertionError} is thrown providing
      * information about the matcher and its failing value.
-     * <p/>
-     * <br/>
+     * </p>
+     * <br>
      * <p>
      * Example:
      * </p>
@@ -274,6 +280,8 @@ public class JSON
      * assertThat("items[0].name", equalTo("Bobby"))
      * }
      * 
+     * @param <T>
+     *            Auto calculated return type.
      * @param matcher
      *            An expression, built of Matchers, specifying how values are
      *            verified.
@@ -298,8 +306,8 @@ public class JSON
      * {@link java.lang.AssertionError AssertionError} with the given message is
      * thrown also providing information about the matcher and its failing
      * value.
-     * <p/>
-     * <br/>
+     * </p>
+     * <br>
      * <p>
      * Example:
      * </p>
@@ -307,6 +315,8 @@ public class JSON
      * assertThat("items[0].name", equalTo("Bobby"))
      * }
      * 
+     * @param <T>
+     *            Auto calculated return type.
      * @param message
      *            The message of the {@link java.lang.AssertionError
      *            AssertionError} if the assert fails.

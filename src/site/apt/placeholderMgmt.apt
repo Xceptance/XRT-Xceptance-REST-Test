@@ -57,7 +57,8 @@ com.xceptance.xrt.placeholder.ph4=value4
  
 +----------------------------
 @ResourceDefinition( baseUrl = "my.url.test.com", resourcePath = "product/${id}" )
-@PlaceholderDefinition( { @Placeholder( name = "id", value = "some_id" ), @Placeholder( name = "phName", value = "phValue" )})
+@PlaceholderDefinition( { @Placeholder( name = "id", value = "some_id" ), 
+    @Placeholder( name = "phName", value = "phValue" )})
 class DefinitionClazz
 {
 }

@@ -17,11 +17,13 @@ Templating of REST Calls
  The following class can be used as a template for a REST call.
 
 +-------------------
-@ResourceDefinition( protocol = "https", baseUrl = "my.url.test.com", port = 8080, basePath = "base/path", resourcePath = "resource", 
-    queryParams = { @QueryParameter( name = "param1", value = "foo" ), @QueryParameter( name = "param2", value = "bar" ) }, 
+@ResourceDefinition( protocol = "https", baseUrl = "my.url.test.com", port = 8080, basePath = "base/path", 
+    resourcePath = "resource", queryParams = { @QueryParameter( name = "param1", value = "foo" ), 
+        @QueryParameter( name = "param2", value = "bar" ) }, 
     fragment = "fragment" )
 @HttpMethodDefinition( HttpMethod.POST )
-@HttpHeaderDefinition( { @HttpHeader( name = "hname", value = "hvalue" ), @HttpHeader( name= "hname2", value = "hvalue2" )})
+@HttpHeaderDefinition( { @HttpHeader( name = "hname", value = "hvalue" ), 
+    @HttpHeader( name= "hname2", value = "hvalue2" )})
 class DefinitionClazz
 {
 }
