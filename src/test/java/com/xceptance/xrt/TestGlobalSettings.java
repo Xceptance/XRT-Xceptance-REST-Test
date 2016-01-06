@@ -110,9 +110,66 @@ public class TestGlobalSettings
     }
     
     @Test
-    public void httpMethod() throws Throwable
+    public void httpMethodPost() throws Throwable
     {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "POST" );
         assertEquals( HttpMethod.POST, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodGet() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "get" );
+        assertEquals( HttpMethod.GET, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodHead() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "HEAD" );
+        assertEquals( HttpMethod.HEAD, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodOptions() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "OPTIONS" );
+        assertEquals( HttpMethod.OPTIONS, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodPut() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "PUT" );
+        assertEquals( HttpMethod.PUT, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodDelete() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "DELETE" );
+        assertEquals( HttpMethod.DELETE, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodPatch() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "PATCH" );
+        assertEquals( HttpMethod.PATCH, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodMixedCase() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "tRaCe" );
+        assertEquals( HttpMethod.TRACE, new RESTCall().getHttpMethod() );
+    }
+    
+    @Test
+    public void httpMethodNotExisting() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.http.method", "foo" );
+        assertNull(new RESTCall().getHttpMethod());
     }
     
     @Test

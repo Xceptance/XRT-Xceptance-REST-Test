@@ -1214,7 +1214,8 @@ public class RESTCall
      */
     public RESTCall patch() throws Throwable
     {
-        throw new NotYetImplementedException("HTTP method 'PATCH' is not yet supported.");
+        this.httpMethod = HttpMethod.PATCH;
+        return process();
     }
 
     /**
@@ -1588,6 +1589,9 @@ public class RESTCall
                 break;
             case "trace":
                 this.httpMethod = HttpMethod.TRACE;
+                break;
+            case "patch":
+                this.httpMethod = HttpMethod.PATCH;
                 break;
         }
     }
