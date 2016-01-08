@@ -10,7 +10,7 @@ import com.jayway.jsonpath.PathNotFoundException;
 
 /**
  * This class manages everything around JSON documents. It allows to create new
- * documents with a various number of constructors and methods and at the same
+ * documents with a various number of constructors and methods (not yet implemented) and at the same
  * time allows a simple access to all properties via JSONPath. With the use of
  * different assertions the validation of JSON documents should be as easy as
  * possible.

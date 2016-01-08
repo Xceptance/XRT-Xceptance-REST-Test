@@ -1,0 +1,23 @@
+ ------------------------
+ Load Testing
+ --------------
+ Patrick Thaele
+ ----------
+ 2016-01-08
+ 
+Load/Performance Testing
+
+ XRT is based on XLT. Therefore you can use the XRT unit tests in loadtests by running the XLT engine. There are certain preconditions 
+ that apply also in normal XLT projects:
+ 
+  [[1]] A class used for load testing can only have one unit test.
+  
+  [[2]] A class used for load testing needs to derive from <<com.xceptance.xlt.api.tests.AbstractTestCase>>
+  
+  []
+  
+  The 2nd point is crucial to avoid memory problems during load and performance testing because <<com.xceptance.xlt.api.tests.AbstractTestCase>> is 
+  responsible for doing the cleanup after a test case has finished.
+  
+  If you need more information on how to configure XLT for your test please visit the XLT documentation on 
+  {{{www.xceptance.com}https://www.xceptance.com/en/xlt/documentation.html}}.

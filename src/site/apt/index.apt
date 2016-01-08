@@ -1,0 +1,60 @@
+ ------------------------
+ Index
+ --------------
+ Patrick Thaele
+ ----------
+ 2016-01-08
+ 
+About Xceptance REST Test (XRT) and Usage
+ 
+ XRT is a REST API testing tool based on Xceptance Load Test (XLT). It can be used for functional tests as well as for load testing REST APIs. 
+ 
+ XRT ships without UI. All tests are implemented in Java as JUnit tests. This allows a good integration into any CI process.
+ 
+* Usage
+
+ The main functionality of XRT is located in one class: <<com.xceptance.xrt.RESTCall.java>>.
+ The simplest configuration you can do is as follows:
+ 
++----------------------
+    // Call the provided URL with HTTP method GET
+    new RESTCall( "www.anyserver.com/rest/api/my_resource" ).get();
++----------------------
+ 
+ <<RESTCall>> comes with a lot of setters to configure your REST call. If you provide an URL (see example above) XRT analyzes the URL 
+ and you can manipulate the URL via setters:
+ 
++----------------------
+    // Provide URL
+    RESTCall call = new RESTCall( "www.anyserver.com/rest/api/my_resource" );
+    
+    // Add a query parameter, port, and HTTP method and change host name
+    call.addQueryParam( "param", "value" ).setPort( 8080 ).setHostName( "www.differentserver.com" ).setHttpMethod( HttpMethod.POST );
+    
+    // Do the REST call
+    call.process();
++----------------------
+
+ The REST call above calls the following URL with HTTP method <<POST>>:
+
++----------------------
+    www.differentserver.com:8080/rest/api/my_resource?param=value
++----------------------
+
+ As you can see in the examples, every setter method of <<RESTCall>> returns the updated instance of the current <<RESTCall>> object. 
+ This allows fluent programming and is a concise way of configuring the REST call.
+ 
+ XRT provides some interesting concepts that keep the configuration of the REST calls readable and even more compact at the same time. Please refer to 
+ the following links for more details:
+ 
+ * {{{./templating.html}Templating of REST calls}}
+ 
+ * {{{./defaultValidation.html}Default Validation}}
+ 
+ * {{{./globalSettings.html}Global Settings}}
+ 
+ * {{{./placeholderMgmt.html}Placeholder Management}}
+ 
+ * {{{./json.html}Asserting JSON with XRT}}
+ 
+ * {{{./loadtesting.html}Load/Performance Testing}}

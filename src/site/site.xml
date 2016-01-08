@@ -13,10 +13,12 @@
 
     <menu name="XRT">
       <item name="Usage" href="index.html">
-      	<item name="Templating of REST Calls" href="templating.html" />
-      	<item name="Default Validation" href="defaultValidation.html" />
+      	<item name="Templating of REST Calls" href="templating.html" />      	
+      	<item name="Default Validation" href="defaultValidation.html" />      	
       	<item name="Global Settings" href="globalSettings.html" />
       	<item name="Placeholder Management" href="placeholderMgmt.html" />
+      	<item name="Asserting JSON with XRT" href="json.html" />
+      	<item name="Load/Performance Testing" href="loadtesting.html" />
       </item>
     </menu>
 

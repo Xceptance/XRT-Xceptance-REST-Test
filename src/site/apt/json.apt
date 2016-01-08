@@ -1,0 +1,66 @@
+ ------------------------
+ JSON
+ --------------
+ Patrick Thaele
+ ----------
+ 2016-01-08
+ 
+Asserting JSON with XRT
+
+ JSON is one of the most used formats for REST documents. XRT supports the evaluation of JSON documents by adopting 
+ the concepts of <<JsonPath>> (see {{{this link}https://github.com/jayway/JsonPath}}). The <<JSON.java>> class of XRT wraps
+ the implementation of <<JSONAsserter.java>> for the following reasons:
+ 
+  * Certain methods should not be exposed like "syntactic sugar", e.g. <<and()>>. It just inflates the class with unnecessary methods.
+  
+  * The order of the arguments of an assertion are now JUnit standard.
+  
+  * Some methods return a different value.
+  
+* Examples
+
++---------------------
+    JSON json = new RESTCall( "www.anyserver.com/rest/api/my_resource" ).get().getResponseBodyAsJSON();
++---------------------
+ 
+ Imagine the REST call above returns the following Json document:
+ 
++---------------------
+    {
+    	"id" : "0001",
+    	"obj" : {
+    	    "numb" : 1,
+    	    "string" : "a string",
+    	    "array" : [
+    	        "text1",
+    	        "text2",
+    	        "text3"
+    	    ],
+    	    "obj2" : {
+    	        "float" : 1.2
+    	    }
+    	}
+    }
++---------------------
+
+** Getting a Property
+
++---------------------
+    int numb = json.get( "obj.numb" );
+    Assert.assertEquals( numb, 1 );
++---------------------
+
+** Doing an Assert Directly
+
++---------------------
+    json.assertEquals( 1, "obj.numb" );
++---------------------
+
+** Getting an Array as List
+
++---------------------
+    List<String> list = json.get( "$.obj.array" );
++---------------------
+
+
+ For more examples see the {{{JsonPath project page}https://github.com/jayway/JsonPath}}).
