@@ -937,7 +937,8 @@ public class RESTCall
      * </p>
      * <br>
      * <p>
-     * <i>id:foobar turns the url into anyhost.com/base/path/resource/foobar?query=value</i>
+     * <i>id:foobar turns the url into
+     * anyhost.com/base/path/resource/foobar?query=value</i>
      * </p>
      * 
      * <br>
@@ -1116,7 +1117,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall process() throws Throwable
     {
@@ -1133,7 +1135,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall get() throws Throwable
     {
@@ -1147,7 +1150,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall post() throws Throwable
     {
@@ -1165,7 +1169,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall post( final String requestBody ) throws Throwable
     {
@@ -1179,7 +1184,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall put() throws Throwable
     {
@@ -1197,7 +1203,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall put( final String requestBody ) throws Throwable
     {
@@ -1211,7 +1218,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall patch() throws Throwable
     {
@@ -1229,7 +1237,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall patch( final String requestBody ) throws Throwable
     {
@@ -1243,7 +1252,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall delete() throws Throwable
     {
@@ -1257,7 +1267,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall head() throws Throwable
     {
@@ -1271,7 +1282,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall options() throws Throwable
     {
@@ -1285,7 +1297,8 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      * 
-     * @throws Throwable Thrown if an error occurs during processing of the REST call. 
+     * @throws Throwable
+     *             Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall trace() throws Throwable
     {
@@ -2098,14 +2111,11 @@ public class RESTCall
      * @throws RESTCallNotYetPerformedException
      *             Unchecked exception.
      */
-    private void checkRESTCallPerformed( String methodName ) throws RESTCallNotYetPerformedException
+    private void checkRESTCallPerformed( String methodName )
     {
         if ( this.response == null )
         {
-            if ( methodName == null || methodName.isEmpty() )
-                throw new RESTCallNotYetPerformedException();
-            else
-                throw new RESTCallNotYetPerformedException( "com.xceptance.xrt.RESTCall#" + methodName );
+            throw new RESTCallNotYetPerformedException( methodName );
         }
 
     }

@@ -25,16 +25,6 @@ public class RESTCallValidator
     /****************************************************************************************
      ************************ Constructors **************************************************
      ****************************************************************************************/
-    
-    /**
-     * Private default constructor. Objects of this class should be created by
-     * XRT.
-     */
-    @SuppressWarnings( "unused" )
-    private RESTCallValidator()
-    {
-        this.call = null;
-    }
 
     /**
      * Package private constructor for XRT only.
@@ -45,11 +35,11 @@ public class RESTCallValidator
     {
         this.call = call;
     }
-    
+
     /****************************************************************************************
      ************************ Public Methods - Request Information **************************
      ****************************************************************************************/
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -61,7 +51,7 @@ public class RESTCallValidator
     {
         return call.getActionName();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -73,11 +63,11 @@ public class RESTCallValidator
     {
         return call.getProtocol();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
-     * @return The port of the request. 
+     * @return The port of the request.
      * 
      * @see RESTCall#getPort()
      */
@@ -85,7 +75,7 @@ public class RESTCallValidator
     {
         return call.getPort();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -97,7 +87,7 @@ public class RESTCallValidator
     {
         return call.getHostName();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -109,7 +99,7 @@ public class RESTCallValidator
     {
         return call.getBasePath();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -121,11 +111,12 @@ public class RESTCallValidator
     {
         return call.getResourcePath();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
-     * @param name The name of the query parameter in the request.
+     * @param name
+     *            The name of the query parameter in the request.
      * @return The value of the query parameter.
      * 
      * @see RESTCall#getQueryParam(String)
@@ -134,7 +125,7 @@ public class RESTCallValidator
     {
         return call.getQueryParam( name );
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -146,7 +137,7 @@ public class RESTCallValidator
     {
         return call.getQueryParams();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -158,7 +149,7 @@ public class RESTCallValidator
     {
         return call.getFragment();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -170,7 +161,7 @@ public class RESTCallValidator
     {
         return call.getUrl();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -182,11 +173,12 @@ public class RESTCallValidator
     {
         return call.getHttpMethod();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
-     * @param name The name of a HTTP parameter in the request. 
+     * @param name
+     *            The name of a HTTP parameter in the request.
      * @return The value of the requested HTTP parameter.
      * 
      * @see RESTCall#getHttpHeader(String)
@@ -195,7 +187,7 @@ public class RESTCallValidator
     {
         return call.getHttpHeader( name );
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -207,11 +199,12 @@ public class RESTCallValidator
     {
         return call.getHttpHeaders();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
-     * @param name The name of a placeholder configured in the REST call.
+     * @param name
+     *            The name of a placeholder configured in the REST call.
      * @return The value of the requested placeholder.
      * 
      * @see RESTCall#getPlaceholderValue(String)
@@ -220,7 +213,7 @@ public class RESTCallValidator
     {
         return call.getPlaceholderValue( name );
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -232,7 +225,7 @@ public class RESTCallValidator
     {
         return call.getPlaceholderValues();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -244,7 +237,7 @@ public class RESTCallValidator
     {
         return call.hasRequestBody();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -256,11 +249,11 @@ public class RESTCallValidator
     {
         return call.getRequestBody();
     }
-    
+
     /****************************************************************************************
      ************************ Public Methods - Response Information *************************
      ****************************************************************************************/
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -272,7 +265,7 @@ public class RESTCallValidator
     {
         return call.getResponseBodyAsString();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -284,7 +277,7 @@ public class RESTCallValidator
     {
         return call.getResponseBodyAsJSON();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -296,7 +289,7 @@ public class RESTCallValidator
     {
         return call.getResponseStatusCode();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -308,7 +301,7 @@ public class RESTCallValidator
     {
         return call.getResponseStatusMessage();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -320,11 +313,12 @@ public class RESTCallValidator
     {
         return call.getResponseHttpHeaders();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
-     * @param name The name of a specific HTTP header of the response.
+     * @param name
+     *            The name of a specific HTTP header of the response.
      * @return The value of the requested HTTP header.
      * 
      * @see RESTCall#getResponseHttpHeader(String)
@@ -333,7 +327,7 @@ public class RESTCallValidator
     {
         return call.getResponseHttpHeader( name );
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
@@ -345,7 +339,7 @@ public class RESTCallValidator
     {
         return call.getResponseContentType();
     }
-    
+
     /**
      * Encapsulated method of {@link RESTCall}.
      * 
