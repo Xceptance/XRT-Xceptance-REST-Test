@@ -344,7 +344,7 @@ public class TestRESTCallResponse
 
         mockAction.getWebClient().setWebConnection( connection );
 
-        RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).get();
+        RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).post("{}");
         Assert.assertEquals( ETAG, call.getResponseETag() );
     }
 

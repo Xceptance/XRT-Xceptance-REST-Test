@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.xceptance.xlt.api.util.XltProperties;
@@ -67,7 +68,12 @@ public class TestDefaultValidation
     /**
      * Global property to enable/disable default validation.
      */
-    private final String GLOB_PROP = "com.xceptance.xrt.defaultValidation.enabled";
+    private final String GLOB_PROP_DEFAULT_VALIDATION = "com.xceptance.xrt.defaultValidation.enabled";
+    
+    /**
+     * Global property to set the default HTTP method.
+     */
+    private final String GLOB_PROP_HTTP_METHOD = "com.xceptance.xrt.http.method";
 
     /**
      * Convenience field for setting properties.
@@ -221,7 +227,7 @@ public class TestDefaultValidation
     public void disableGlobally() throws Throwable
     {
         // Disable default validation globally via property
-        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+        XltProperties.getInstance().setProperty( GLOB_PROP_DEFAULT_VALIDATION, FALSE );
 
         // Perform call
         RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
@@ -243,7 +249,7 @@ public class TestDefaultValidation
     public void overrideGlobalSettingByRESTCall() throws Throwable
     {
         // Disable default validation globally via property
-        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+        XltProperties.getInstance().setProperty( GLOB_PROP_DEFAULT_VALIDATION, FALSE );
 
         // Perform call
         RESTCall call = new RESTCall( DefaultValidation_Correct.class ).setPreviousAction( mockAction );
@@ -288,7 +294,7 @@ public class TestDefaultValidation
     public void disableByResourceDefNoOverrideByRESTCall() throws Throwable
     {
         // Disable default validation globally via property
-        XltProperties.getInstance().setProperty( GLOB_PROP, FALSE );
+        XltProperties.getInstance().setProperty( GLOB_PROP_DEFAULT_VALIDATION, FALSE );
 
         // Perform call
         RESTCall call = new RESTCall( DefaultValidation_Correct.class, DefaultValidation_Disabled.class )
@@ -314,12 +320,16 @@ public class TestDefaultValidation
     @Test
     public void enableDisabledResourceDefByRESTCall_Constructor() throws Throwable
     {
+        // Set a default HTTP method via global properties
+        XltProperties.getInstance().setProperty( GLOB_PROP_HTTP_METHOD, "PATCH" );
+        
         RESTCall call = new RESTCall( DefaultValidation_Disabled.class, true ).setDefinitionClass(
                 DefaultValidation_Disabled2nd.class ).setPreviousAction( mockAction );
 
         assertTrue( "Default validation should be enabled by default.", call.isDefaultValidationEnabled() );
+        assertEquals( HttpMethod.PATCH, call.getHttpMethod() );
 
-        call.get();
+        call.process();
 
         assertTrue( "DefaultValidation_Disabled: not performed.", DefaultValidation_Disabled.valPerformed );
         assertFalse( "DefaultValidation_Disabled2nd: performed.", DefaultValidation_Disabled2nd.valPerformed );

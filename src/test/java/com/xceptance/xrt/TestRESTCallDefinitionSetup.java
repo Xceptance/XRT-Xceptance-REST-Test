@@ -10,6 +10,8 @@ import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.xceptance.xrt.annotation.HttpHeader;
 import com.xceptance.xrt.annotation.HttpHeaderDefinition;
 import com.xceptance.xrt.annotation.HttpMethodDefinition;
+import com.xceptance.xrt.annotation.Placeholder;
+import com.xceptance.xrt.annotation.PlaceholderDefinition;
 import com.xceptance.xrt.annotation.QueryParameter;
 import com.xceptance.xrt.annotation.ResourceDefinition;
 
@@ -61,7 +63,7 @@ public class TestRESTCallDefinitionSetup
     public void resourceDefinition_complete()
     {
         // Define the resource definition
-        @ResourceDefinition( protocol = "https", baseUrl = "my.url.test.com", port = 8080, basePath = "base/path", resourcePath = "resource", queryParams = {
+        @ResourceDefinition( actionName = "some action", protocol = "https", baseUrl = "my.url.test.com", port = 8080, basePath = "base/path", resourcePath = "resource", queryParams = {
                 @QueryParameter( name = "param1", value = "foo" ), @QueryParameter( name = "param2", value = "bar" ) }, fragment = "fragment" )
         class DefinitionClass
         {
@@ -71,6 +73,7 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ",
                 "https://my.url.test.com:8080/base/path/resource?param1=foo&param2=bar#fragment", call.getUrl() );
+        Assert.assertEquals( "some action", call.getActionName() );
     }
 
     /**
@@ -129,17 +132,17 @@ public class TestRESTCallDefinitionSetup
 
         Assert.assertEquals( "Expected Url: ", "https://my.url.test.com", call.getUrl() );
     }
-    
+
     /**
      * Calls the constructor that takes a class with definition annotations as
-     * an argument. The class defines a protocol with the separator <b>http://</b> via the resource
-     * definition.
+     * an argument. The class defines a protocol with the separator
+     * <b>http://</b> via the resource definition.
      */
     @Test
     public void resourceDefinition_protocolWithSeparator()
     {
         // Define the resource definition
-        @ResourceDefinition( baseUrl = "my.url.test.com", protocol="https://" )
+        @ResourceDefinition( baseUrl = "my.url.test.com", protocol = "https://" )
         class DefinitionClass
         {
         }
@@ -208,6 +211,42 @@ public class TestRESTCallDefinitionSetup
         Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/resource", call.getUrl() );
     }
 
+    @Test
+    public void placeholderDefinition()
+    {
+        // Define the resource definition and placeholders
+        @ResourceDefinition( baseUrl = "${protocol}://my.url.test.${tld}", basePath = "/base/${basepath}", resourcePath = "/resource/${subresource}" )
+        @PlaceholderDefinition( { @Placeholder( name = "protocol", value = "https" ),
+                @Placeholder( name = "tld", value = "net" ), @Placeholder( name = "basepath", value = "path" ),
+                @Placeholder( name = "subresource", value = "subres" ) } )
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall(DefinitionClass.class);
+        Assert.assertEquals( "Expected Url:",  "https://my.url.test.net/base/path/resource/subres", call.getUrl() );
+    }
+    
+    @Test
+    public void placeholderDefinitionSeparateClass()
+    {
+        // Define the resource definition and placeholders
+        @ResourceDefinition( baseUrl = "${protocol}://my.url.test.${tld}", basePath = "/base/${basepath}", resourcePath = "/resource/${subresource}" )
+        class DefinitionClass
+        {
+        }
+        
+        @PlaceholderDefinition( { @Placeholder( name = "protocol", value = "https" ),
+            @Placeholder( name = "tld", value = "net" ), @Placeholder( name = "basepath", value = "path" ),
+            @Placeholder( name = "subresource", value = "subres" ) } )
+        class PlaceholderClass
+        {            
+        }
+
+        RESTCall call = new RESTCall(DefinitionClass.class, PlaceholderClass.class);
+        Assert.assertEquals( "Expected Url:",  "https://my.url.test.net/base/path/resource/subres", call.getUrl() );
+    }    
+
     /**
      * Calls the constructor that takes a class with definition annotations as
      * an argument. The class defines the base Url and the base path via the
@@ -246,10 +285,10 @@ public class TestRESTCallDefinitionSetup
 
         RESTCall call = new RESTCall( DefinitionClass.class );
 
-        Map<String,String> expectedMap = new HashMap<String,String>();
+        Map<String, String> expectedMap = new HashMap<String, String>();
         expectedMap.put( "Content-type", "application/json" );
         expectedMap.put( "x-custom", "true" );
-        
+
         Assert.assertEquals( "Expected Http Headers: ", expectedMap, call.getHttpHeaders() );
     }
 }

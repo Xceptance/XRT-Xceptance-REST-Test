@@ -286,7 +286,12 @@ public class RESTCall
     {
         // If no action name was provided return the resource path.
         if ( this.actionName.isEmpty() )
-            return this.resourcePath;
+        {
+            if ( getResourcePath().isEmpty() )
+                return "anonymous action";
+            else
+                return getResourcePath();
+        }
 
         return this.actionName;
     }
@@ -335,14 +340,16 @@ public class RESTCall
     public RESTCall setProtocol( final String protocol )
     {
         // Do nothing if the protocol is null.
-        if ( protocol != null )
-        {
-            this.protocol = protocol;
+        if ( protocol == null )
+            return this;
 
-            // Remove the protocol separator
-            this.protocol = this.protocol.replaceAll( "/", "" );
-            this.protocol = this.protocol.replaceAll( ":", "" );
-        }
+        // Remove the protocol separators
+        String update = protocol;
+        update = update.replaceAll( "/", "" );
+        update = update.replaceAll( ":", "" );
+
+        if ( !protocol.isEmpty() )
+            this.protocol = update;
 
         return this;
     }
@@ -368,7 +375,8 @@ public class RESTCall
     public RESTCall setPort( final int port )
     {
         // Do nothing if the port is negative or 0.
-        if ( port > 0 )
+        // Go back to default if port is -1.
+        if ( port > 0 || port == -1 )
             this.port = port;
 
         return this;
@@ -590,7 +598,7 @@ public class RESTCall
      */
     public RESTCall setFragment( final String fragment )
     {
-        // Do nothing if the fragmant is null.
+        // Do nothing if the fragment is null.
         if ( fragment != null )
             this.fragment = fragment;
 
@@ -694,9 +702,7 @@ public class RESTCall
      */
     public RESTCall setUrl( final String url )
     {
-        // Do nothing if the Url is null.
-        if ( url != null )
-            splitUrl( url );
+        splitUrl( url );
 
         return this;
     }
@@ -712,21 +718,19 @@ public class RESTCall
      */
     public String getUrl()
     {
-        // String builder that builds the Url.
+        // String builder that builds the URL.
         StringBuilder builder = new StringBuilder();
 
-        if ( !this.protocol.isEmpty() )
-            builder.append( this.protocol ).append( "://" );
+        builder.append( getProtocol() ).append( "://" );
 
-        // A Url without host name does not make any sense.
-        if ( this.hostName.isEmpty() )
+        // An URL without host name does not make any sense.
+        if ( getHostName().isEmpty() )
             return null;
 
-        builder.append( hostName );
+        builder.append( getHostName() );
 
-        if ( this.port > 0 && !( this.port == 80 && this.protocol.equals( "http" ) )
-                && !( this.port == 443 && this.protocol.equals( "https" ) ) )
-            builder.append( ":" ).append( this.port );
+        if ( getPort() > 0 )
+            builder.append( ":" ).append( getPort() );
 
         if ( !this.basePath.isEmpty() )
             builder.append( "/" ).append( this.basePath );
@@ -1084,7 +1088,9 @@ public class RESTCall
      */
     public RESTCall setRequestBody( Object requestBody )
     {
-        this.requestBody = requestBody.toString();
+        if(requestBody != null)
+            this.requestBody = requestBody.toString();
+        
         return this;
     }
 
@@ -1306,6 +1312,57 @@ public class RESTCall
         return process();
     }
 
+    /**
+     * Enables or disables default validation.
+     * 
+     * @param enabled
+     *            <b>true</b> enables default validation, <b>false</b> turns it
+     *            off.
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall defaultValidation( final boolean enabled )
+    {
+        this.enableDefaultValidation = enabled;
+
+        return this;
+    }
+
+    /**
+     * Allows to enable/disable default validation for the specified resource
+     * definition individually. In contrast to
+     * {@link RESTCall#setDefinitionClass(Class, boolean)} this method does not
+     * apply the settings of the REST definition class.
+     * 
+     * 
+     * @param resourceDef
+     *            The class that provides default values for a REST resource.
+     * @param enableDefaultValidation
+     *            Should be <b>true</b> to enable default validation for this
+     *            resource explicitly or <b>false</b> to disable this resource.
+     * 
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall defaultValidation( final Class<?> resourceDef, final boolean enableDefaultValidation )
+    {
+        if ( enableDefaultValidation )
+            readValidator( resourceDef );
+        else
+            removeValidator( resourceDef );
+
+        return this;
+    }
+
+    /**
+     * Returns whether default validation is enabled or not.
+     * 
+     * @return <b>true</b> if default validation is enabled, <b>false</b> if
+     *         not.
+     */
+    public boolean isDefaultValidationEnabled()
+    {
+        return this.enableDefaultValidation;
+    }
+
     /****************************************************************************************
      ************************ Public Methods - Response Handling ****************************
      ****************************************************************************************/
@@ -1319,10 +1376,9 @@ public class RESTCall
      * 
      * @return The updated RESTCall instance.
      */
-    RESTCall setRESTResponse( WebResponse response )
+    void setRESTResponse( WebResponse response )
     {
         this.response = response;
-        return this;
     }
 
     /**
@@ -1474,57 +1530,6 @@ public class RESTCall
         return getResponseHttpHeader( "ETag" );
     }
 
-    /**
-     * Enables or disables default validation.
-     * 
-     * @param enabled
-     *            <b>true</b> enables default validation, <b>false</b> turns it
-     *            off.
-     * @return The updated RESTCall instance.
-     */
-    public RESTCall defaultValidation( final boolean enabled )
-    {
-        this.enableDefaultValidation = enabled;
-
-        return this;
-    }
-
-    /**
-     * Allows to enable/disable default validation for the specified resource
-     * definition individually. In contrast to
-     * {@link RESTCall#setDefinitionClass(Class, boolean)} this method does not
-     * apply the settings of the REST definition class.
-     * 
-     * 
-     * @param resourceDef
-     *            The class that provides default values for a REST resource.
-     * @param enableDefaultValidation
-     *            Should be <b>true</b> to enable default validation for this
-     *            resource explicitly or <b>false</b> to disable this resource.
-     * 
-     * @return The updated RESTCall instance.
-     */
-    public RESTCall defaultValidation( final Class<?> resourceDef, final boolean enableDefaultValidation )
-    {
-        if ( enableDefaultValidation )
-            readValidator( resourceDef );
-        else
-            removeValidator( resourceDef );
-
-        return this;
-    }
-
-    /**
-     * Returns whether default validation is enabled or not.
-     * 
-     * @return <b>true</b> if default validation is enabled, <b>false</b> if
-     *         not.
-     */
-    public boolean isDefaultValidationEnabled()
-    {
-        return this.enableDefaultValidation;
-    }
-
     /****************************************************************************************
      ************************ Private Methods ***********************************************
      ****************************************************************************************/
@@ -1558,14 +1563,14 @@ public class RESTCall
         // Read regular global settings
         XltProperties globSettings = XltProperties.getInstance();
 
-        this.hostName = globSettings.getProperty( "com.xceptance.xrt.host", this.hostName );
-        this.protocol = globSettings.getProperty( "com.xceptance.xrt.protocol", this.protocol );
-        this.port = globSettings.getProperty( "com.xceptance.xrt.port", this.port );
-        this.basePath = globSettings.getProperty( "com.xceptance.xrt.basePath", this.basePath );
-        this.resourcePath = globSettings.getProperty( "com.xceptance.xrt.resourcePath", this.resourcePath );
-        this.fragment = globSettings.getProperty( "com.xceptance.xrt.fragment", this.fragment );
-        this.enableDefaultValidation = globSettings.getProperty( "com.xceptance.xrt.defaultValidation.enabled",
-                this.enableDefaultValidation );
+        setHostName( globSettings.getProperty( "com.xceptance.xrt.host", this.hostName ) );
+        setProtocol( globSettings.getProperty( "com.xceptance.xrt.protocol", this.protocol ) );
+        setPort( globSettings.getProperty( "com.xceptance.xrt.port", this.port ) );
+        setBasePath( globSettings.getProperty( "com.xceptance.xrt.basePath", this.basePath ) );
+        setResourcePath( globSettings.getProperty( "com.xceptance.xrt.resourcePath", this.resourcePath ) );
+        setFragment( globSettings.getProperty( "com.xceptance.xrt.fragment", this.fragment ) );
+        defaultValidation( globSettings.getProperty( "com.xceptance.xrt.defaultValidation.enabled",
+                this.enableDefaultValidation ) );
 
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
@@ -1584,28 +1589,28 @@ public class RESTCall
         switch ( httpMethod )
         {
             case "get":
-                this.httpMethod = HttpMethod.GET;
+                setHttpMethod( HttpMethod.GET );
                 break;
             case "post":
-                this.httpMethod = HttpMethod.POST;
+                setHttpMethod( HttpMethod.POST );
                 break;
             case "put":
-                this.httpMethod = HttpMethod.PUT;
+                setHttpMethod( HttpMethod.PUT );
                 break;
             case "delete":
-                this.httpMethod = HttpMethod.DELETE;
+                setHttpMethod( HttpMethod.DELETE );
                 break;
             case "head":
-                this.httpMethod = HttpMethod.HEAD;
+                setHttpMethod( HttpMethod.HEAD );
                 break;
             case "options":
-                this.httpMethod = HttpMethod.OPTIONS;
+                setHttpMethod( HttpMethod.OPTIONS );
                 break;
             case "trace":
-                this.httpMethod = HttpMethod.TRACE;
+                setHttpMethod( HttpMethod.TRACE );
                 break;
             case "patch":
-                this.httpMethod = HttpMethod.PATCH;
+                setHttpMethod( HttpMethod.PATCH );
                 break;
         }
     }
@@ -1662,45 +1667,33 @@ public class RESTCall
         if ( def == null )
             return;
 
-        // Read the properties of the annotation.
-        // First split the url and save each part.
-        if ( !def.baseUrl().isEmpty() )
-            splitUrl( def.baseUrl() );
+        // Read all properties of the definition
+        // Do not override setting with default values of
+        // ResourceDefinition.class
+        setUrl( def.baseUrl() );
 
         if ( !def.protocol().isEmpty() )
-        {
-            this.protocol = def.protocol();
+            setProtocol( def.protocol() );
 
-            // Remove the protocol separator
-            this.protocol = this.protocol.replaceAll( "/", "" );
-            this.protocol = this.protocol.replaceAll( ":", "" );
-        }
-
-        if ( def.port() >= 0 )
-            this.port = def.port();
+        if ( def.port() > 0 )
+            setPort( def.port() );
 
         if ( !def.basePath().isEmpty() )
-            this.basePath = sanitizeUrlPathSegment( def.basePath() );
+            setBasePath( def.basePath() );
 
         if ( !def.resourcePath().isEmpty() )
-            this.resourcePath = sanitizeUrlPathSegment( def.resourcePath() );
+            setResourcePath( def.resourcePath() );
 
-        if ( def.queryParams().length != 0 )
+        for ( QueryParameter param : def.queryParams() )
         {
-            // Loop through the list of parameters and add them to the query
-            // parameter map.
-            for ( int i = 0; i < def.queryParams().length; i++ )
-            {
-                QueryParameter param = def.queryParams()[i];
-                this.queryParams.put( param.name(), param.value() );
-            }
+            addQueryParam( param.name(), param.value() );
         }
 
         if ( !def.fragment().isEmpty() )
-            this.fragment = def.fragment();
+            setFragment( def.fragment() );
 
         if ( !def.actionName().isEmpty() )
-            this.actionName = def.actionName();
+            setActionName( def.actionName() );
     }
 
     /**
@@ -1869,7 +1862,7 @@ public class RESTCall
         int index = restUrl.indexOf( "://" );
         if ( index != -1 )
         {
-            this.protocol = restUrl.substring( 0, index );
+            setProtocol( restUrl.substring( 0, index ) );
             restUrl = restUrl.substring( index + 3 );
         }
 

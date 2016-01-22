@@ -78,7 +78,7 @@ public class TestUrlSplitter
     {
         RESTCall call = new RESTCall( "://my.url.test.com" );
 
-        Assert.assertEquals( "Expected Url: ", "my.url.test.com", call.getUrl() );
+        Assert.assertEquals( "Expected Url: ", "http://my.url.test.com", call.getUrl() );
     }
 
     /**
