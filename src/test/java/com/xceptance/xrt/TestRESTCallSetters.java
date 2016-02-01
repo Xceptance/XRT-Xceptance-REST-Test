@@ -3,8 +3,6 @@ package com.xceptance.xrt;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.spec.RC2ParameterSpec;
-
 import org.hamcrest.Matchers;
 import org.junit.Test;
 

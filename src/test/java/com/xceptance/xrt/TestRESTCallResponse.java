@@ -9,15 +9,15 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.RESTCall;
 import com.xceptance.xrt.RESTCallNotYetPerformedException;
-
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * This class validates the response behavior of the RESTCall class.
@@ -27,14 +27,17 @@ import static org.hamcrest.Matchers.containsString;
  */
 public class TestRESTCallResponse
 {
-    /**
-     * URL used for mocked request.
-     */
-    private final String URL = "www.xrt.com";
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     /****************************************************************************************
      ************************ Mock Settings *************************************************
      ****************************************************************************************/
+
+    /**
+     * URL used for mocked request.
+     */
+    private final String URL = "www.xrt.com";
 
     /**
      * The mocked response body.
@@ -75,16 +78,16 @@ public class TestRESTCallResponse
     {
         XltProperties.getInstance().setProperty( "com.xceptance.xlt.result-dir", "tmp" );
     }
-    
+
     /**
-     * Cleanup the timer output. 
+     * Cleanup the timer output.
      */
     @AfterClass
     public static void tearDownFinally() throws Throwable
     {
-        FileUtils.deleteDirectory( new File("tmp") );
+        FileUtils.deleteDirectory( new File( "tmp" ) );
     }
-    
+
     /**
      * Test setup. Creates the mocked action that needs to be used in every test
      * as previous action.
@@ -131,17 +134,10 @@ public class TestRESTCallResponse
     @Test
     public void getResponseBodyAsString_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseBodyAsString();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseBodyAsString()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseBodyAsString()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseBodyAsString();
     }
 
     @Test
@@ -168,17 +164,10 @@ public class TestRESTCallResponse
     @Test
     public void getResponseBodyAsJSON_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseBodyAsJSON();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseBodyAsJSON()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseBodyAsJSON()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseBodyAsJSON();
     }
 
     @Test
@@ -191,40 +180,26 @@ public class TestRESTCallResponse
     @Test
     public void getResponseStatusCode_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseStatusCode();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseStatusCode()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseStatusCode()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseStatusCode();
     }
-    
+
     @Test
     public void getResponseStatusMessage_Positive() throws Throwable
     {
         RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).get();
         Assert.assertEquals( STATUS_MESSAGE, call.getResponseStatusMessage() );
     }
-    
+
     @Test
     public void getResponseStatusMessage_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseStatusMessage();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseStatusMessage()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseStatusMessage()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseStatusMessage();
     }
 
     @Test
@@ -253,17 +228,10 @@ public class TestRESTCallResponse
     @Test
     public void getResponseHttpHeaders_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseHttpHeaders();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseHttpHeaders()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseHttpHeaders()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseHttpHeaders();
     }
 
     @Test
@@ -283,17 +251,10 @@ public class TestRESTCallResponse
     @Test
     public void getResponseHttpHeader_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseHttpHeader( "foo" );
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseHttpHeader(String)" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseHttpHeader(String)" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseHttpHeader( "foo" );
     }
 
     @Test
@@ -319,17 +280,10 @@ public class TestRESTCallResponse
     @Test
     public void getResponseContentType_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseContentType();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseContentType()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseContentType()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseContentType();
     }
 
     @Test
@@ -344,7 +298,7 @@ public class TestRESTCallResponse
 
         mockAction.getWebClient().setWebConnection( connection );
 
-        RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).post("{}");
+        RESTCall call = new RESTCall( URL ).setPreviousAction( mockAction ).post( "{}" );
         Assert.assertEquals( ETAG, call.getResponseETag() );
     }
 
@@ -358,16 +312,9 @@ public class TestRESTCallResponse
     @Test
     public void getResponseETag_NoCallPerformed()
     {
-        try
-        {
-            new RESTCall().getResponseETag();
-        }
-        catch ( RESTCallNotYetPerformedException e )
-        {
-            Assert.assertThat( e.getMessage(), containsString( "getResponseETag()" ) );
-            return;
-        }
+        expectedException.expect( RESTCallNotYetPerformedException.class );
+        expectedException.expectMessage( "getResponseETag()" );
 
-        Assert.fail( "'RESTCallNotYetPerformedException' expected." );
+        new RESTCall().getResponseETag();
     }
 }
