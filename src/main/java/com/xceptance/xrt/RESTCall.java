@@ -1,13 +1,5 @@
 package com.xceptance.xrt;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
@@ -15,15 +7,16 @@ import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.SessionShutdownListener;
 import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.api.util.XltProperties;
-import com.xceptance.xrt.annotation.DisableDefaultValidation;
-import com.xceptance.xrt.annotation.HttpHeader;
-import com.xceptance.xrt.annotation.HttpHeaderDefinition;
-import com.xceptance.xrt.annotation.HttpMethodDefinition;
-import com.xceptance.xrt.annotation.Placeholder;
-import com.xceptance.xrt.annotation.PlaceholderDefinition;
-import com.xceptance.xrt.annotation.QueryParameter;
-import com.xceptance.xrt.annotation.ResourceDefinition;
+import com.xceptance.xrt.annotation.*;
 import com.xceptance.xrt.document.JSON;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -1379,6 +1372,18 @@ public class RESTCall
     void setRESTResponse( WebResponse response )
     {
         this.response = response;
+    }
+
+    /**
+     * Returns the response object. The REST call must be performed before this method
+     * can return a body. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
+     *
+     * @return The plain response object.
+     */
+    public WebResponse getRESTResponse() {
+        checkRESTCallPerformed("getRESTResponse()");
+
+        return response;
     }
 
     /**

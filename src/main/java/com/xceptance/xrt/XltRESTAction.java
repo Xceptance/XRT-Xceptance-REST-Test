@@ -1,11 +1,11 @@
 package com.xceptance.xrt;
 
-import java.net.URL;
-
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.xceptance.xlt.api.actions.AbstractLightWeightPageAction;
 import com.xceptance.xlt.api.util.XltLogger;
+
+import java.net.URL;
 
 /**
  * This class performs the REST call as configured in the REST call instance.
