@@ -40,7 +40,9 @@ public class XltRESTAction extends AbstractLightWeightPageAction
     @Override
     public void preValidate() throws Exception
     {
-        // Nothing to pre-validate
+        // Perform pre-processing
+        if(restCall.getPreprocessor() != null)
+            restCall.getPreprocessor().preProcess(restCall);
     }
 
     /**

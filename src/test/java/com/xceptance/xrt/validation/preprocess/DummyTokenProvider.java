@@ -3,8 +3,6 @@ package com.xceptance.xrt.validation.preprocess;
 import com.xceptance.xrt.PreProcessible;
 import com.xceptance.xrt.RESTCall;
 
-import java.time.Instant;
-
 /**
  *
  *
@@ -14,10 +12,10 @@ public class DummyTokenProvider implements PreProcessible{
 
     private String token = "somerandomtoken";
 
-    private final Instant creationTime;
+    private final long creationTime;
 
     public DummyTokenProvider() {
-        creationTime = Instant.now();
+        creationTime = System.currentTimeMillis();
     }
 
     public void preProcess(final RESTCall call){
