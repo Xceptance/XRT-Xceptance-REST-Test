@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Xceptance REST Test">
-  <bannerLeft>
-    <name>XRT</name>
-    <src>https://www.xceptance.com/images/xceptance-logo-transparent-202px.png</src>
-    <href>http://www.xceptance.com/</href>
-  </bannerLeft>
-  
-  <body>
-    <links>
-      <item name="Xceptance" href="http://www.xceptance.com/" />
-    </links>
+    <bannerLeft>
+        <name>XRT</name>
+        <src>https://www.xceptance.com/images/xceptance-logo-transparent-202px.png</src>
+        <href>http://www.xceptance.com/</href>
+    </bannerLeft>
 
-    <menu name="XRT">
-      <item name="Usage" href="index.html">
-      	<item name="Templating of REST Calls" href="templating.html" />      	
-      	<item name="Default Validation" href="defaultValidation.html" />      	
-      	<item name="Global Settings" href="globalSettings.html" />
-      	<item name="Placeholder Management" href="placeholderMgmt.html" />
-      	<item name="Asserting JSON with XRT" href="json.html" />
-      	<item name="Load/Performance Testing" href="loadtesting.html" />
-      </item>
-    </menu>
+    <body>
+        <links>
+            <item name="Xceptance" href="http://www.xceptance.com/"/>
+        </links>
 
-    <menu ref="reports"/>
+        <menu name="XRT">
+            <item name="Usage" href="index.html">
+                <item name="Templating of REST Calls" href="templating.html"/>
+                <item name="Default Validation" href="defaultValidation.html"/>
+                <item name="Global Settings" href="globalSettings.html"/>
+                <item name="Placeholder Management" href="placeholderMgmt.html"/>
+                <item name="Pre-Processing" href="preProcessing.html"/>
+                <item name="Asserting JSON with XRT" href="json.html"/>
+                <item name="Load/Performance Testing" href="loadtesting.html"/>
+            </item>
+        </menu>
 
-  </body>
+        <menu ref="reports"/>
+
+    </body>
 </project>

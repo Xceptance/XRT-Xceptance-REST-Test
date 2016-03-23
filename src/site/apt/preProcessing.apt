@@ -1,0 +1,87 @@
+ ------------------
+ Pre-Processing
+ --------------
+ Patrick Thaele
+ ----------
+ 2016-03-23
+
+
+Pre-Processing
+
+ Usually REST APIs have certain ways of authenticating users. Since REST APIs are usually sessionless this is mostly
+ accomplished by sending tokens with every call. The XRT feature Pre-processing allows to define and set a class for
+ exactly this scenario. There might be other scenarios where manipulating all calls in the very same manner is useful.
+
+ To perform the pre-processing XRT needs an instance of a class that implements the interface <<<PreProcessible>>>.
+ Configuring XRT can be done in different ways:
+
+* Setting the Pre-Processor Directly
+
+ You can set a pre-processor directly at the <<<RESTCall>>> object. The pre-processor object needs to implement the interface
+ <<<PreProcessible>>>. The flag <<<reuse>>> defines whether the  pre-processor should be used just in this call or for
+ the rest of the test case.
+
++---------------
+@Test
+public void someTest()
+{
+    new RESTCall( "some.url.com" ).setPreprocessor( new OAuthClient(), true ).get();
+}
++---------------
+
+* Implementing the Interface
+
+ The second way of telling XRT what to do in the pre-processing step is implementing the interface <<<PreProcessible>>>
+ at the definition class. After that XRT tries to instantiate the definition class. Whatever is defined here is only
+ performed for the RESTCall that uses this definition class.
+
++---------------
+/**
+* The REST call definition class.
+*/
+@ResourceDefinition( actionName="test action", resourcePath = "myResource" )
+@HttpMethodDefinition( HttpMethod.GET )
+public abstract class ExampleClazz implements PreProcessible
+{
+	@Override
+    public void preProcess( RESTCall call )
+    {
+        // Do something clever in the pre-processing step.
+    }
+}
++---------------
+
+* The Annotation <<<PreProcess>>>
+
+ Like all other features XRT allows to define a pre-processor via annotation. The pre-processor class needs to implement
+ the interface <<<PreProcessible>>>. <<<reuseInstance>>> defines whether the pre-processor should be used for the whole
+ test case.
+
+ <NOTE:> XRT takes care of not initializing objects over and over again when a definition class used multiple times.
+
++---------------
+/**
+* The REST call definition class.
+*/
+@ResourceDefinition( actionName="test action", resourcePath = "myResource" )
+@HttpMethodDefinition( HttpMethod.GET )
+@PreProcess( value = OAuthClient.class, reuseInstance = true)
+public abstract class ExampleClazz
+{
+}
++---------------
+
+* Global Settings
+
+ The final way of configuring a pre-processor is via a *.properties file. When the referenced class cannot be found XRT
+ ignores the setting and prints a warning.
+
++---------------
+# The class path of the class that XRT is supposed to instantiate
+com.xceptance.xrt.preprocess.class=com.some.class.path.ClassName
+# "true" if XRT is supposed to reuse the instantiated instance, "false" if every call should instantiate a new object
+# default is "false"
+com.xceptance.xrt.preprocess.reuseInstance=false
++---------------
+
+ For more information please read the JavaDoc of the RESTCall class.
