@@ -1,17 +1,19 @@
 package com.xceptance.xrt;
 
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.xceptance.xlt.api.util.XltProperties;
+import com.xceptance.xrt.authentication.BasicAuthCredentials;
+import com.xceptance.xrt.authentication.MissingUserNameException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
-
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.BeforeClass;
-
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.xceptance.xlt.api.util.XltProperties;
 
 /**
  * Tests the XRT specific global settings added in the *.properties files, e.g.
@@ -205,5 +207,48 @@ public class TestGlobalSettings
     public void constructorResourceDefAndDefaultValidationFlag() throws Throwable
     {
         assertEquals( HttpMethod.POST, new RESTCall( "www.anotherURL.com/path/resource" ).getHttpMethod() );
+    }
+
+    @Test
+    public void basicAuthCredentials() throws Throwable
+    {
+        RESTCall call = new RESTCall( "www.xrt.com" );
+        BasicAuthCredentials credentials = call.getBasicAuthCredentials();
+
+        assertEquals( "user1", credentials.getUsername() );
+        assertEquals( "pwd", credentials.getPassword() );
+    }
+
+    @Test
+    public void basicAuthCredentials_noPWD() throws Throwable
+    {
+        XltProperties.getInstance().removeProperty( "com.xceptance.xrt.authentication.basic.password" );
+
+        RESTCall call = new RESTCall( "www.xrt.com" );
+        BasicAuthCredentials credentials = call.getBasicAuthCredentials();
+
+        assertEquals( "user1", credentials.getUsername() );
+        assertEquals( "", credentials.getPassword() );
+
+        // Test cleanup
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.authentication.basic.password", "pwd" );
+    }
+
+    @Test( expected = MissingUserNameException.class )
+    public void basicAuthCredentials_noUsername() throws Throwable
+    {
+        XltProperties.getInstance().setProperty( "com.xceptance.xrt.authentication.basic.username", "" );
+
+        try
+        {
+            new RESTCall();
+        }
+        finally
+        {
+            // Test cleanup
+            XltProperties.getInstance().setProperty( "com.xceptance.xrt.authentication.basic.username", "user1" );
+        }
+
+        Assert.fail( "Empty user name should not be allowed." );
     }
 }

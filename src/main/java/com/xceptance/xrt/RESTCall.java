@@ -8,6 +8,8 @@ import com.xceptance.xlt.api.engine.SessionShutdownListener;
 import com.xceptance.xlt.api.util.XltLogger;
 import com.xceptance.xlt.api.util.XltProperties;
 import com.xceptance.xrt.annotation.*;
+import com.xceptance.xrt.annotation.authentication.BasicAuth;
+import com.xceptance.xrt.authentication.BasicAuthCredentials;
 import com.xceptance.xrt.document.JSON;
 
 import java.lang.reflect.Constructor;
@@ -31,7 +33,6 @@ import java.util.Map.Entry;
  * <br>
  *
  * @author Patrick Thaele
- *
  */
 public class RESTCall
 {
@@ -40,8 +41,8 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * Implements an automatic approach for action handling. Is set to null in
-     * {@link RESTCall#init()} when session dies at the end of a test case.
+     * Implements an automatic approach for action handling. Is set to null in {@link RESTCall#init()} when session dies
+     * at the end of a test case.
      */
     private static ThreadLocal<XltRESTAction> prevAction = new ThreadLocal<>();
 
@@ -59,8 +60,7 @@ public class RESTCall
     // an initial value to avoid NULL pointer exceptions.
 
     /**
-     * The action name that appears in the load test report after the REST call
-     * was performed.
+     * The action name that appears in the load test report after the REST call was performed.
      */
     private String actionName = "";
 
@@ -80,10 +80,8 @@ public class RESTCall
     private String hostName = "";
 
     /**
-     * The base path used in the REST call. The base path is the part of the Url
-     * between host name and resource path, e.g.
-     * <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b>
-     * is the base path in the Url.
+     * The base path used in the REST call. The base path is the part of the Url between host name and resource path,
+     * e.g. <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b> is the base path in the Url.
      */
     private String basePath = "";
 
@@ -93,14 +91,12 @@ public class RESTCall
     private String resourcePath = "";
 
     /**
-     * A map of query parameters that are used in the REST call, e.g.
-     * <b>xceptance.com/base/path/resource?paramName=paramValue</b>.
+     * A map of query parameters that are used in the REST call, e.g. <b>xceptance.com/base/path/resource?paramName=paramValue</b>.
      */
     private Map<String, String> queryParams = new HashMap<>();
 
     /**
-     * The fragment used in the REST call, e.g.
-     * <b>xceptance.com/base/path/resource?paramName=paramValue#fragment</b>.
+     * The fragment used in the REST call, e.g. <b>xceptance.com/base/path/resource?paramName=paramValue#fragment</b>.
      */
     private String fragment = "";
 
@@ -115,10 +111,14 @@ public class RESTCall
     private Map<String, String> httpHeaders = new HashMap<>();
 
     /**
-     * The request body of the REST call. Certain HTTP methods, e.g. POST, can
-     * send a body.
+     * The request body of the REST call. Certain HTTP methods, e.g. POST, can send a body.
      */
     private String requestBody;
+
+    /**
+     * The credentials for basic authentication used in the REST call.
+     */
+    private BasicAuthCredentials basicAuthCredentials;
 
     /**
      * The response of the REST call.
@@ -126,8 +126,7 @@ public class RESTCall
     private WebResponse response;
 
     /**
-     * The map of placeholders that are replaced by their values in the final
-     * REST call.
+     * The map of placeholders that are replaced by their values in the final REST call.
      */
     private Map<String, String> placeholders = new HashMap<>();
 
@@ -150,28 +149,26 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * The cache for the response content is filled when requested the first
-     * time and deleted when this instance is reused for another REST call.
+     * The cache for the response content is filled when requested the first time and deleted when this instance is
+     * reused for another REST call.
      */
     private String responseContent;
 
     /**
-     * The cache for the response status code is filled when requested the first
-     * time and deleted when this instance is reused for another REST call.
+     * The cache for the response status code is filled when requested the first time and deleted when this instance is
+     * reused for another REST call.
      */
     private int responseStatusCode = -1;
 
     /**
-     * The cache for the response status message is filled when requested the
-     * first time and deleted when this instance is reused for another REST
-     * call.
+     * The cache for the response status message is filled when requested the first time and deleted when this instance
+     * is reused for another REST call.
      */
     private String responseStatusMessage;
 
     /**
-     * The cache for the response HTTP headers is filled when requested the
-     * first time and deleted when this instance is reused for another REST
-     * call.
+     * The cache for the response HTTP headers is filled when requested the first time and deleted when this instance is
+     * reused for another REST call.
      */
     private List<NameValuePair> responseHttpHeaders = null;
 
@@ -180,8 +177,7 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * Default constructor. Uses global settings and can be adjusted by public
-     * methods.
+     * Default constructor. Uses global settings and can be adjusted by public methods.
      */
     public RESTCall()
     {
@@ -213,7 +209,7 @@ public class RESTCall
      * <br>
      *
      * @param resourceDefs
-     *            Those classes that provide default values for a REST resource.
+     *         Those classes that provide default values for a REST resource.
      */
     public RESTCall( Class<?>... resourceDefs )
     {
@@ -224,17 +220,17 @@ public class RESTCall
     }
 
     /**
-     * Constructor that allows to enable/disable default validation for the
-     * specified resource definition individually while setting it.
-     *
-     * To understand what is considered a resource definition please read the
-     * documentation of {@link RESTCall#RESTCall(Class...)}.
+     * Constructor that allows to enable/disable default validation for the specified resource definition individually
+     * while setting it.
+     * <p>
+     * To understand what is considered a resource definition please read the documentation of {@link
+     * RESTCall#RESTCall(Class...)}.
      *
      * @param resourceDef
-     *            The class that provides default values for a REST resource.
+     *         The class that provides default values for a REST resource.
      * @param enableDefaultValidation
-     *            Should be <b>true</b> to enable default validation for this
-     *            resource explicitly or <b>false</b> to disable this resource.
+     *         Should be <b>true</b> to enable default validation for this resource explicitly or <b>false</b> to
+     *         disable this resource.
      */
     public RESTCall( Class<?> resourceDef, boolean enableDefaultValidation )
     {
@@ -244,12 +240,11 @@ public class RESTCall
     }
 
     /**
-     * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map
-     * the Url into the internal representation. It assumes that the last path
-     * element is the identifier for the resource.
+     * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map the Url into the internal
+     * representation. It assumes that the last path element is the identifier for the resource.
      *
      * @param url
-     *            The Url used for the REST call.
+     *         The Url used for the REST call.
      */
     public RESTCall( final String url )
     {
@@ -263,11 +258,11 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * Sets the action name for the REST call. This name appears in the XLT load
-     * test report once the REST call was performed during a load test.
+     * Sets the action name for the REST call. This name appears in the XLT load test report once the REST call was
+     * performed during a load test.
      *
      * @param actionName
-     *            The name of the REST call action.
+     *         The name of the REST call action.
      *
      * @return The updated RESTCall instance.
      */
@@ -280,8 +275,7 @@ public class RESTCall
     }
 
     /**
-     * Returns the action name of the REST call. If no action name was provided
-     * the resource path is returned.
+     * Returns the action name of the REST call. If no action name was provided the resource path is returned.
      *
      * @return The action name of the REST call.
      */
@@ -300,14 +294,13 @@ public class RESTCall
     }
 
     /**
-     * Sets the previously performed REST action. XLT handles everything around
-     * sessions and cookies automatically when the previous action is known.
-     * Removing the previous session by providing <b>null</b> as the value
-     * forces XLT to open a new web client with a new session.
+     * Sets the previously performed REST action. XLT handles everything around sessions and cookies automatically when
+     * the previous action is known. Removing the previous session by providing <b>null</b> as the value forces XLT to
+     * open a new web client with a new session.
      *
      * @param previousAction
-     *            The previously performed REST action. <b>null</b> removes the
-     *            old previous action and starts a new session.
+     *         The previously performed REST action. <b>null</b> removes the old previous action and starts a new
+     *         session.
      *
      * @return The updated RESTCall instance.
      */
@@ -319,9 +312,9 @@ public class RESTCall
     }
 
     /**
-     * Returns the previously performed REST action. This action can be set via
-     * {@link #setPreviousAction(XltRESTAction)} or is set after this REST call
-     * was performed. Returns <b>null</b> if none of the two conditions applies.
+     * Returns the previously performed REST action. This action can be set via {@link
+     * #setPreviousAction(XltRESTAction)} or is set after this REST call was performed. Returns <b>null</b> if none of
+     * the two conditions applies.
      *
      * @return The previously performed REST action.
      */
@@ -331,12 +324,11 @@ public class RESTCall
     }
 
     /**
-     * Sets the protocol of this REST call, e.g. <b>http</b>. It's not necessary
-     * to set the protocol separator <b>://</b> because it is added
-     * automatically when creating the Url.
+     * Sets the protocol of this REST call, e.g. <b>http</b>. It's not necessary to set the protocol separator
+     * <b>://</b> because it is added automatically when creating the Url.
      *
      * @param protocol
-     *            The new protocol of this REST call.
+     *         The new protocol of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -371,7 +363,7 @@ public class RESTCall
      * Sets the port of this REST call, e.g. <b>80</b>.
      *
      * @param port
-     *            The new port of this REST call.
+     *         The new port of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -399,7 +391,7 @@ public class RESTCall
      * Sets the host name of this REST call, e.g. <b>xceptance.com</b>.
      *
      * @param hostName
-     *            The new host name of this REST call.
+     *         The new host name of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -413,8 +405,7 @@ public class RESTCall
     }
 
     /**
-     * Returns the host name of the REST call configuration, e.g.
-     * <b>xceptance.com</b>.
+     * Returns the host name of the REST call configuration, e.g. <b>xceptance.com</b>.
      *
      * @return The host name of the REST call configuration.
      */
@@ -424,13 +415,11 @@ public class RESTCall
     }
 
     /**
-     * Sets the base path of this REST call. The base path is the part of the
-     * Url between host name and resource path, e.g.
-     * <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b>
-     * is the base path in the Url.
+     * Sets the base path of this REST call. The base path is the part of the Url between host name and resource path,
+     * e.g. <b>xceptance.com/base/path/resource</b>. In the example <b>base/path</b> is the base path in the Url.
      *
      * @param basePath
-     *            The new base path of this REST call.
+     *         The new base path of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -444,8 +433,7 @@ public class RESTCall
     }
 
     /**
-     * Returns the base path of the REST call configuration, e.g.
-     * <b>base/path</b>.
+     * Returns the base path of the REST call configuration, e.g. <b>base/path</b>.
      *
      * @return The base path of the REST call configuration.
      */
@@ -455,13 +443,12 @@ public class RESTCall
     }
 
     /**
-     * Sets the resource path of this REST call. The resource path is the part
-     * of the Url after the base path, e.g.
-     * <b>xceptance.com/base/path/resource/subresource</b>. In the example
-     * <b>resource/subresource</b> is the resource path in the Url.
+     * Sets the resource path of this REST call. The resource path is the part of the Url after the base path, e.g.
+     * <b>xceptance.com/base/path/resource/subresource</b>. In the example <b>resource/subresource</b> is the resource
+     * path in the Url.
      *
      * @param resourcePath
-     *            The new resource path of this REST call.
+     *         The new resource path of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -475,8 +462,7 @@ public class RESTCall
     }
 
     /**
-     * Returns the resource path of the REST call configuration, e.g.
-     * <b>resource/subresource</b>.
+     * Returns the resource path of the REST call configuration, e.g. <b>resource/subresource</b>.
      *
      * @return The resource path of the REST call configuration.
      */
@@ -486,14 +472,13 @@ public class RESTCall
     }
 
     /**
-     * Adds/updates a query parameter to the REST call configuration. Since
-     * query parameters must be unique the new parameter replaces an already
-     * existing one with the same name.
+     * Adds/updates a query parameter to the REST call configuration. Since query parameters must be unique the new
+     * parameter replaces an already existing one with the same name.
      *
      * @param name
-     *            The name of the query parameter, e.g. <b>color</b>.
+     *         The name of the query parameter, e.g. <b>color</b>.
      * @param value
-     *            The value of the query parameter, e.g. <b>red</b>.
+     *         The value of the query parameter, e.g. <b>red</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -504,14 +489,12 @@ public class RESTCall
     }
 
     /**
-     * Adds/updates several query parameters to the REST call configuration.
-     * Since query parameters must be unique the new parameters replace already
-     * existing ones with the same name.
+     * Adds/updates several query parameters to the REST call configuration. Since query parameters must be unique the
+     * new parameters replace already existing ones with the same name.
      *
      * @param queryParams
-     *            A map of query parameters. The key element in the map should
-     *            be the name of the parameter, the value element should be its
-     *            value.
+     *         A map of query parameters. The key element in the map should be the name of the parameter, the value
+     *         element should be its value.
      *
      * @return The updated RESTCall instance.
      */
@@ -525,10 +508,9 @@ public class RESTCall
      * Returns the value of the query parameter with the given name.
      *
      * @param name
-     *            The name of the query parameter, e.g. <b>color</b>.
+     *         The name of the query parameter, e.g. <b>color</b>.
      *
-     * @return The value of the query parameter with the given name. If no value
-     *         was found <b>null</b> is returned.
+     * @return The value of the query parameter with the given name. If no value was found <b>null</b> is returned.
      */
     public String getQueryParam( final String name )
     {
@@ -536,8 +518,7 @@ public class RESTCall
     }
 
     /**
-     * Returns a map of the configured query parameters for this REST call, e.g.
-     * <b>...?color=red</b>.
+     * Returns a map of the configured query parameters for this REST call, e.g. <b>...?color=red</b>.
      *
      * @return A map of the configured query parameters for this REST call.
      */
@@ -550,7 +531,7 @@ public class RESTCall
      * Removes a query parameter from the REST call configuration by its name.
      *
      * @param name
-     *            The name of the query parameter, e.g. <b>color</b>.
+     *         The name of the query parameter, e.g. <b>color</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -561,11 +542,10 @@ public class RESTCall
     }
 
     /**
-     * Removes several query parameters from the REST call configuration by
-     * their names.
+     * Removes several query parameters from the REST call configuration by their names.
      *
      * @param names
-     *            An array of names of the query parameters, e.g. <b>color</b>.
+     *         An array of names of the query parameters, e.g. <b>color</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -591,11 +571,10 @@ public class RESTCall
     }
 
     /**
-     * Sets the fragment of this REST call. It is added to the end of the Url
-     * separated from the rest by the '#' sign.
+     * Sets the fragment of this REST call. It is added to the end of the Url separated from the rest by the '#' sign.
      *
      * @param fragment
-     *            The new fragment of this REST call.
+     *         The new fragment of this REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -642,7 +621,7 @@ public class RESTCall
      * effect.
      *
      * @param resourceDef
-     *            The class that provides default values for a REST resource.
+     *         The class that provides default values for a REST resource.
      *
      * @return The updated RESTCall instance.
      */
@@ -669,12 +648,13 @@ public class RESTCall
      * </p>
      *
      * @param resourceDef
-     *            The class that provides default values for a REST resource.
+     *         The class that provides default values for a REST resource.
      * @param enableDefaultValidation
-     *            Should be <b>true</b> to enable default validation for this
-     *            resource explicitly or <b>false</b> to disable this resource.
+     *         Should be <b>true</b> to enable default validation for this resource explicitly or <b>false</b> to
+     *         disable this resource.
      *
      * @return The updated RESTCall instance.
+     *
      * @see RESTCall#defaultValidation(Class, boolean)
      */
     public RESTCall setDefinitionClass( final Class<?> resourceDef, boolean enableDefaultValidation )
@@ -691,18 +671,19 @@ public class RESTCall
                 readValidator( resourceDef );
 
             readPreprocessorDefinition( resourceDef );
+            readBasicAuthDefinition( resourceDef );
         }
 
         return this;
     }
 
     /**
-     * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map
-     * the Url into the internal representation. It assumes that the last path
-     * element is the identifier for the resource.
+     * Takes an Url as a String argument. The <b>RESTCall</b> class tries to map the Url into the internal
+     * representation. It assumes that the last path element is the identifier for the resource.
      *
      * @param url
-     *            The Url used for the REST call.
+     *         The Url used for the REST call.
+     *
      * @return The updated RESTCall instance.
      */
     public RESTCall setUrl( final String url )
@@ -713,13 +694,11 @@ public class RESTCall
     }
 
     /**
-     * Creates the REST Url. All elements are Url encoded. The host name is
-     * mandatory. The default protocol is <b>http</b> and its default port is
-     * <b>80</b>. If the protocol is <b>https</b> its default port is
-     * <b>433</b>. All placeholders were replaced by their corresponding values.
+     * Creates the REST Url. All elements are Url encoded. The host name is mandatory. The default protocol is
+     * <b>http</b> and its default port is <b>80</b>. If the protocol is <b>https</b> its default port is <b>433</b>.
+     * All placeholders were replaced by their corresponding values.
      *
-     * @return The Url ready to call. Returns <b>null</b> if the host name is
-     *         missing.
+     * @return The Url ready to call. Returns <b>null</b> if the host name is missing.
      */
     public String getUrl()
     {
@@ -727,6 +706,15 @@ public class RESTCall
         StringBuilder builder = new StringBuilder();
 
         builder.append( getProtocol() ).append( "://" );
+
+        if ( basicAuthCredentials != null )
+        {
+            builder.append( basicAuthCredentials.getUsername() );
+            if ( !basicAuthCredentials.getPassword().isEmpty() )
+                builder.append( ":" ).append( basicAuthCredentials.getPassword() );
+
+            builder.append( "@" );
+        }
 
         // An URL without host name does not make any sense.
         if ( getHostName().isEmpty() )
@@ -764,7 +752,7 @@ public class RESTCall
      * Sets the HTTP method for this REST call.
      *
      * @param httpMethod
-     *            The HTTP method used in the REST call.
+     *         The HTTP method used in the REST call.
      *
      * @return The updated RESTCall instance.
      *
@@ -789,14 +777,13 @@ public class RESTCall
     }
 
     /**
-     * Adds/updates a HTTP header to the REST call configuration. Since HTTP
-     * headers must be unique the new header replaces an already existing one
-     * with the same name.
+     * Adds/updates a HTTP header to the REST call configuration. Since HTTP headers must be unique the new header
+     * replaces an already existing one with the same name.
      *
      * @param name
-     *            The name of the HTTP header, e.g. <b>Content-type</b>.
+     *         The name of the HTTP header, e.g. <b>Content-type</b>.
      * @param value
-     *            The value of the HTTP header, e.g. <b>application/json</b>.
+     *         The value of the HTTP header, e.g. <b>application/json</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -807,13 +794,12 @@ public class RESTCall
     }
 
     /**
-     * Adds/updates several HTTP headers to the REST call configuration. Since
-     * HTTP headers must be unique the new headers replace already existing ones
-     * with the same name.
+     * Adds/updates several HTTP headers to the REST call configuration. Since HTTP headers must be unique the new
+     * headers replace already existing ones with the same name.
      *
      * @param httpHeaders
-     *            A map of HTTP headers. The key element in the map should be
-     *            the name of the header, the value element should be its value.
+     *         A map of HTTP headers. The key element in the map should be the name of the header, the value element
+     *         should be its value.
      *
      * @return The updated RESTCall instance.
      */
@@ -827,10 +813,9 @@ public class RESTCall
      * Returns the value of the HTTP header with the given name.
      *
      * @param name
-     *            The name of the HTTP header, e.g. <b>Content-type</b>.
+     *         The name of the HTTP header, e.g. <b>Content-type</b>.
      *
-     * @return The value of the HTTP header with the given name. If no value was
-     *         found <b>null</b> is returned.
+     * @return The value of the HTTP header with the given name. If no value was found <b>null</b> is returned.
      */
     public String getHttpHeader( final String name )
     {
@@ -838,8 +823,7 @@ public class RESTCall
     }
 
     /**
-     * Returns a map of the configured HTTP headers for this REST call, e.g.
-     * Content-type:application/json.
+     * Returns a map of the configured HTTP headers for this REST call, e.g. Content-type:application/json.
      *
      * @return A map of the configured HTTP headers for this REST call.
      */
@@ -852,7 +836,7 @@ public class RESTCall
      * Removes a HTTP header from the REST call configuration by its name.
      *
      * @param name
-     *            The name of the HTTP header, e.g. <b>Content-type</b>.
+     *         The name of the HTTP header, e.g. <b>Content-type</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -863,12 +847,10 @@ public class RESTCall
     }
 
     /**
-     * Removes several HTTP headers from the REST call configuration by their
-     * names.
+     * Removes several HTTP headers from the REST call configuration by their names.
      *
      * @param names
-     *            An array of names of the HTTP headers, e.g.
-     *            <b>Content-type</b>.
+     *         An array of names of the HTTP headers, e.g. <b>Content-type</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -894,13 +876,11 @@ public class RESTCall
     }
 
     /**
-     * Convenience method. Adds the <b>If-Match</b> header to the list of HTTP
-     * headers. The same action can be done by calling the method
-     * {@link #addHttpHeader(String, String)} with the header name
-     * <b>If-Match</b>.
+     * Convenience method. Adds the <b>If-Match</b> header to the list of HTTP headers. The same action can be done by
+     * calling the method {@link #addHttpHeader(String, String)} with the header name <b>If-Match</b>.
      *
      * @param ifMatchHeader
-     *            The value of the <b>If-Match</b> HTTP header.
+     *         The value of the <b>If-Match</b> HTTP header.
      *
      * @return The updated RESTCall instance.
      */
@@ -911,13 +891,11 @@ public class RESTCall
     }
 
     /**
-     * Convenience method. Adds the <b>If-None-Match</b> header to the list of
-     * HTTP headers. The same action can be done by calling the method
-     * {@link #addHttpHeader(String, String)} with the header name
-     * <b>If-None-Match</b>.
+     * Convenience method. Adds the <b>If-None-Match</b> header to the list of HTTP headers. The same action can be done
+     * by calling the method {@link #addHttpHeader(String, String)} with the header name <b>If-None-Match</b>.
      *
      * @param ifNoneMatchHeader
-     *            The value of the <b>If-None-Match</b> HTTP header.
+     *         The value of the <b>If-None-Match</b> HTTP header.
      *
      * @return The updated RESTCall instance.
      */
@@ -958,9 +936,9 @@ public class RESTCall
      * </p>
      *
      * @param name
-     *            The name of the placeholder, e.g. <b>id</b>.
+     *         The name of the placeholder, e.g. <b>id</b>.
      * @param value
-     *            The value of the placeholder, e.g. <b>foobar</b>.
+     *         The value of the placeholder, e.g. <b>foobar</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -971,14 +949,12 @@ public class RESTCall
     }
 
     /**
-     * Adds/updates several placeholder values to the REST call configuration.
-     * Since placeholders must be unique the new placeholder values replace
-     * already existing ones with the same name.
+     * Adds/updates several placeholder values to the REST call configuration. Since placeholders must be unique the new
+     * placeholder values replace already existing ones with the same name.
      *
      * @param placeholderValues
-     *            A map of placeholder name-value pairs. The key element in the
-     *            map should be the name of the placeholder, the value element
-     *            should be its value.
+     *         A map of placeholder name-value pairs. The key element in the map should be the name of the placeholder,
+     *         the value element should be its value.
      *
      * @return The updated RESTCall instance.
      */
@@ -992,10 +968,9 @@ public class RESTCall
      * Returns the value of the placeholder with the given name.
      *
      * @param name
-     *            The name of the placeholder, e.g. <b>id</b>.
+     *         The name of the placeholder, e.g. <b>id</b>.
      *
-     * @return The value of the placeholder with the given name. If no value was
-     *         found <b>null</b> is returned.
+     * @return The value of the placeholder with the given name. If no value was found <b>null</b> is returned.
      */
     public String getPlaceholderValue( final String name )
     {
@@ -1016,7 +991,7 @@ public class RESTCall
      * Removes a placeholder value from the REST call configuration by its name.
      *
      * @param name
-     *            The name of the placeholder, e.g. <b>id</b>.
+     *         The name of the placeholder, e.g. <b>id</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -1027,11 +1002,10 @@ public class RESTCall
     }
 
     /**
-     * Removes several placeholder values from the REST call configuration by
-     * their names.
+     * Removes several placeholder values from the REST call configuration by their names.
      *
      * @param names
-     *            An array of names of the placeholders, e.g. <b>id</b>.
+     *         An array of names of the placeholders, e.g. <b>id</b>.
      *
      * @return The updated RESTCall instance.
      */
@@ -1057,11 +1031,9 @@ public class RESTCall
     }
 
     /**
-     * Returns <b>true</b> if the REST call configuration contains a request
-     * body, <b>false</b> if not.
+     * Returns <b>true</b> if the REST call configuration contains a request body, <b>false</b> if not.
      *
-     * @return <b>true</b> if the REST call configuration contains a request
-     *         body, <b>false</b> if not.
+     * @return <b>true</b> if the REST call configuration contains a request body, <b>false</b> if not.
      */
     public boolean hasRequestBody()
     {
@@ -1072,7 +1044,7 @@ public class RESTCall
      * Sets the request body of the REST call.
      *
      * @param requestBody
-     *            The body of the REST call.
+     *         The body of the REST call.
      *
      * @return The updated RESTCall instance.
      */
@@ -1086,25 +1058,23 @@ public class RESTCall
      * Sets the request body of the REST call.
      *
      * @param requestBody
-     *            The body of the REST call. Uses the toString() method of the
-     *            object to set the body.
+     *         The body of the REST call. Uses the toString() method of the object to set the body.
      *
      * @return The updated RESTCall instance.
      */
     public RESTCall setRequestBody( Object requestBody )
     {
-        if(requestBody != null)
+        if ( requestBody != null )
             this.requestBody = requestBody.toString();
 
         return this;
     }
 
     /**
-     * Returns the request body of this REST call configuration. All
-     * placeholders in the body were replaced by their corresponding values.
+     * Returns the request body of this REST call configuration. All placeholders in the body were replaced by their
+     * corresponding values.
      *
-     * @return The request body of this REST call configuration. If no request
-     *         body was set, <b>null</b> is returned.
+     * @return The request body of this REST call configuration. If no request body was set, <b>null</b> is returned.
      */
     public String getRequestBody()
     {
@@ -1123,13 +1093,37 @@ public class RESTCall
     }
 
     /**
-     * Makes the call using the configured Url ( {@link #getUrl()} ), the HTTP
-     * headers, and the HTTP method.
+     * Sets credentials for basic authentication. XRT adds them to the URL for readability. The XLT framework underneath
+     * transfers them as <b>Authentication</b> header.
+     *
+     * @param credentials
+     *         The credentials for basic authentication.
+     *
+     * @return The updated RESTCall instance.
+     */
+    public RESTCall setBasicAuthCredentials( final BasicAuthCredentials credentials )
+    {
+        basicAuthCredentials = credentials;
+        return this;
+    }
+
+    /**
+     * Returns the credentials for basic authentication.
+     *
+     * @return The {@link BasicAuthCredentials} instance.
+     */
+    public BasicAuthCredentials getBasicAuthCredentials()
+    {
+        return basicAuthCredentials;
+    }
+
+    /**
+     * Makes the call using the configured Url ( {@link #getUrl()} ), the HTTP headers, and the HTTP method.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall process() throws Throwable
     {
@@ -1144,13 +1138,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with GET and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with GET and performs
+     * the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall get() throws Throwable
     {
@@ -1159,13 +1153,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with POST and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with POST and performs
+     * the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall post() throws Throwable
     {
@@ -1174,17 +1168,16 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with POST, sets the request body, and performs the
-     * call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with POST, sets the
+     * request body, and performs the call.
      *
      * @param requestBody
-     *            The request body used in the REST call.
+     *         The request body used in the REST call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall post( final String requestBody ) throws Throwable
     {
@@ -1193,13 +1186,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with PUT and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with PUT and performs
+     * the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall put() throws Throwable
     {
@@ -1208,17 +1201,16 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with PUT, sets the request body, and performs the
-     * call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with PUT, sets the
+     * request body, and performs the call.
      *
      * @param requestBody
-     *            The request body used in the REST call.
+     *         The request body used in the REST call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall put( final String requestBody ) throws Throwable
     {
@@ -1227,13 +1219,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with PATCH and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with PATCH and
+     * performs the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall patch() throws Throwable
     {
@@ -1242,17 +1234,16 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with PATCH, sets the request body, and performs the
-     * call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with PATCH, sets the
+     * request body, and performs the call.
      *
      * @param requestBody
-     *            The request body used in the REST call.
+     *         The request body used in the REST call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall patch( final String requestBody ) throws Throwable
     {
@@ -1261,13 +1252,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with DELETE and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with DELETE and
+     * performs the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall delete() throws Throwable
     {
@@ -1276,13 +1267,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with HEAD and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with HEAD and performs
+     * the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall head() throws Throwable
     {
@@ -1291,13 +1282,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with OPTIONS and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with OPTIONS and
+     * performs the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall options() throws Throwable
     {
@@ -1306,13 +1297,13 @@ public class RESTCall
     }
 
     /**
-     * This method is similar to {@link #process()}. It overrides the setting
-     * for the HTTP method with TRACE and performs the call.
+     * This method is similar to {@link #process()}. It overrides the setting for the HTTP method with TRACE and
+     * performs the call.
      *
      * @return The updated RESTCall instance.
      *
      * @throws Throwable
-     *             Thrown if an error occurs during processing of the REST call.
+     *         Thrown if an error occurs during processing of the REST call.
      */
     public RESTCall trace() throws Throwable
     {
@@ -1324,8 +1315,8 @@ public class RESTCall
      * Enables or disables default validation.
      *
      * @param enabled
-     *            <b>true</b> enables default validation, <b>false</b> turns it
-     *            off.
+     *         <b>true</b> enables default validation, <b>false</b> turns it off.
+     *
      * @return The updated RESTCall instance.
      */
     public RESTCall defaultValidation( final boolean enabled )
@@ -1336,17 +1327,15 @@ public class RESTCall
     }
 
     /**
-     * Allows to enable/disable default validation for the specified resource
-     * definition individually. In contrast to
-     * {@link RESTCall#setDefinitionClass(Class, boolean)} this method does not
-     * apply the settings of the REST definition class.
-     *
+     * Allows to enable/disable default validation for the specified resource definition individually. In contrast to
+     * {@link RESTCall#setDefinitionClass(Class, boolean)} this method does not apply the settings of the REST
+     * definition class.
      *
      * @param resourceDef
-     *            The class that provides default values for a REST resource.
+     *         The class that provides default values for a REST resource.
      * @param enableDefaultValidation
-     *            Should be <b>true</b> to enable default validation for this
-     *            resource explicitly or <b>false</b> to disable this resource.
+     *         Should be <b>true</b> to enable default validation for this resource explicitly or <b>false</b> to
+     *         disable this resource.
      *
      * @return The updated RESTCall instance.
      */
@@ -1363,8 +1352,7 @@ public class RESTCall
     /**
      * Returns whether default validation is enabled or not.
      *
-     * @return <b>true</b> if default validation is enabled, <b>false</b> if
-     *         not.
+     * @return <b>true</b> if default validation is enabled, <b>false</b> if not.
      */
     public boolean isDefaultValidationEnabled()
     {
@@ -1373,21 +1361,24 @@ public class RESTCall
 
     /**
      * Allows to set a pre-processor for a single call or for the rest of the test case. This method can also be used to
-     * override existing settings. <b>null</b> as value for the pre-processor is allowed and clears an existing pre-processor.
+     * override existing settings. <b>null</b> as value for the pre-processor is allowed and clears an existing
+     * pre-processor.
      *
      * @param preprocessor
-     *              The pre-processor instance used for pre-processing.
+     *         The pre-processor instance used for pre-processing.
      * @param reuse
-     *              Should be <b>true</b> if the pre-processor should be used in the whole test case, <b>false</b> if not.
+     *         Should be <b>true</b> if the pre-processor should be used in the whole test case, <b>false</b> if not.
      *
      * @return The updated RESTCall instance.
      */
-    public RESTCall setPreprocessor(final PreProcessible preprocessor, boolean reuse) {
-        if(reuse){
-            preprocessorReuse.set(preprocessor);
+    public RESTCall setPreprocessor( final PreProcessible preprocessor, boolean reuse )
+    {
+        if ( reuse )
+        {
+            preprocessorReuse.set( preprocessor );
             this.preprocessor = null;
-        }
-        else{
+        } else
+        {
             this.preprocessor = preprocessor;
             preprocessorReuse.remove();
         }
@@ -1396,16 +1387,17 @@ public class RESTCall
     }
 
     /**
-     * Returns the currently configured pre-processor. Depending on the previous settings that can be the reuseable pre-processor
-     * or the one configured for this single call.
+     * Returns the currently configured pre-processor. Depending on the previous settings that can be the reuseable
+     * pre-processor or the one configured for this single call.
      *
      * @return The configured pre-processor instance. Can be <b>null</b> if no pre-processor is configured.
      */
-    public PreProcessible getPreprocessor() {
-        if(preprocessor != null)
+    public PreProcessible getPreprocessor()
+    {
+        if ( preprocessor != null )
             return preprocessor;
 
-        if(preprocessorReuse.get() != null)
+        if ( preprocessorReuse.get() != null )
             return preprocessorReuse.get();
 
         return null;
@@ -1416,11 +1408,11 @@ public class RESTCall
      ****************************************************************************************/
 
     /**
-     * Sets the response of this REST call. When performing the configured REST
-     * call ( {@link #process() }) the REST response is set automatically.
+     * Sets the response of this REST call. When performing the configured REST call ( {@link #process() }) the REST
+     * response is set automatically.
      *
      * @param response
-     *            The response of the REST call.
+     *         The response of the REST call.
      */
     void setRESTResponse( WebResponse response )
     {
@@ -1428,21 +1420,21 @@ public class RESTCall
     }
 
     /**
-     * Returns the response object. The REST call must be performed before this method
-     * can return a body. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response object. The REST call must be performed before this method can return a body. Otherwise a
+     * {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The plain response object.
      */
-    public WebResponse getRESTResponse() {
-        checkRESTCallPerformed("getRESTResponse()");
+    public WebResponse getRESTResponse()
+    {
+        checkRESTCallPerformed( "getRESTResponse()" );
 
         return response;
     }
 
     /**
-     * Returns the response body as String. The REST call must be performed
-     * before this method can return a body. Otherwise a
-     * {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response body as String. The REST call must be performed before this method can return a body.
+     * Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The response body as String.
      */
@@ -1458,9 +1450,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the response body as {@link com.xceptance.xrt.document.JSON JSON}
-     * . The REST call must be performed before this method can return a body.
-     * Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response body as {@link com.xceptance.xrt.document.JSON JSON} . The REST call must be performed
+     * before this method can return a body. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The response body as String.
      */
@@ -1472,9 +1463,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the response status code, e.g. 200 or 400. The REST call must be
-     * performed before this method can return a status code. Otherwise a
-     * {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response status code, e.g. 200 or 400. The REST call must be performed before this method can return
+     * a status code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The response status code.
      */
@@ -1490,9 +1480,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the response status code, e.g. 200 or 400. The REST call must be
-     * performed before this method can return a status code. Otherwise a
-     * {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response status code, e.g. 200 or 400. The REST call must be performed before this method can return
+     * a status code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The response status code.
      */
@@ -1508,9 +1497,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the response HTTP headers as a list of name-value pairs. The REST
-     * call must be performed before this method can return the list. Otherwise
-     * a {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response HTTP headers as a list of name-value pairs. The REST call must be performed before this
+     * method can return the list. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The list of response HTTP headers.
      */
@@ -1526,16 +1514,14 @@ public class RESTCall
     }
 
     /**
-     * Returns the response HTTP header where the given name matches. If the
-     * header can not be found null is returned. The REST call must be performed
-     * before this method can return a status code. Otherwise a
-     * {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the response HTTP header where the given name matches. If the header can not be found null is returned.
+     * The REST call must be performed before this method can return a status code. Otherwise a {@link
+     * RESTCallNotYetPerformedException} is thrown.
      *
      * @param name
-     *            The name of the header to be found.
+     *         The name of the header to be found.
      *
-     * @return The response HTTP header value that was searched by its name.
-     *         Null if the header is not present.
+     * @return The response HTTP header value that was searched by its name. Null if the header is not present.
      */
     public String getResponseHttpHeader( final String name )
     {
@@ -1553,9 +1539,8 @@ public class RESTCall
     }
 
     /**
-     * Returns the content type of the response. The REST call must be performed
-     * before this method can return a status code. Otherwise a
-     * {@link RESTCallNotYetPerformedException} is thrown.
+     * Returns the content type of the response. The REST call must be performed before this method can return a status
+     * code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      *
      * @return The content type of the response.
      */
@@ -1578,8 +1563,7 @@ public class RESTCall
      * code. Otherwise a {@link RESTCallNotYetPerformedException} is thrown.
      * </p>
      *
-     * @return The <b>ETag</b> header value of the response. Returns <b>null</b>
-     *         if no <b>ETag</b> header was found.
+     * @return The <b>ETag</b> header value of the response. Returns <b>null</b> if no <b>ETag</b> header was found.
      */
     public String getResponseETag()
     {
@@ -1635,11 +1619,19 @@ public class RESTCall
                 this.enableDefaultValidation ) );
 
         // Try to instantiate preprocessor via global settings
-        if( preprocessorReuse.get() == null ) {
-            String preProcessorClassName = globSettings.getProperty("com.xceptance.xrt.preprocess.class");
-            boolean reusePreprocessor = globSettings.getProperty("com.xceptance.xrt.preprocess.reuseInstance", false);
-            instantiatePreprocessor(preProcessorClassName, reusePreprocessor);
+        if ( preprocessorReuse.get() == null )
+        {
+            String preProcessorClassName = globSettings.getProperty( "com.xceptance.xrt.preprocess.class" );
+            boolean reusePreprocessor = globSettings.getProperty( "com.xceptance.xrt.preprocess.reuseInstance", false );
+            instantiatePreprocessor( preProcessorClassName, reusePreprocessor );
         }
+
+        // Read basic authentication credentials
+        String username = globSettings.getProperty( "com.xceptance.xrt.authentication.basic.username" );
+        String password = globSettings.getProperty( "com.xceptance.xrt.authentication.basic.password" );
+
+        if ( username != null )
+            basicAuthCredentials = new BasicAuthCredentials( username, password );
 
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
@@ -1690,14 +1682,13 @@ public class RESTCall
     }
 
     /**
-     * Reads the global settings of a property that contains a list of key-value
-     * pairs and stores them in the corresponding map.
+     * Reads the global settings of a property that contains a list of key-value pairs and stores them in the
+     * corresponding map.
      *
      * @param key
-     *            The identifier of the property in the global settings.
+     *         The identifier of the property in the global settings.
      * @param propertyMap
-     *            The map that needs to be filled with the key-value pairs of
-     *            the property.
+     *         The map that needs to be filled with the key-value pairs of the property.
      */
     private void readGlobalListProperty( final String key, Map<String, String> propertyMap )
     {
@@ -1722,46 +1713,49 @@ public class RESTCall
     }
 
     /**
-     * Tries to instantiate a class that implements the interface {@link PreProcessible} with the given class name. Occurring
-     * errors are caught and printed as warnings.
+     * Tries to instantiate a class that implements the interface {@link PreProcessible} with the given class name.
+     * Occurring errors are caught and printed as warnings.
      *
      * @param className
-     *              The name of the class that is supposed to be instantiated.
+     *         The name of the class that is supposed to be instantiated.
      * @param reuseInstance
-     *              Should be <b>true</b> if the pre-processor should be used in the whole test case, <b>false</b> if not.
+     *         Should be <b>true</b> if the pre-processor should be used in the whole test case, <b>false</b> if not.
+     *
      * @return <b>true</b> if the instantiation was successful, <b>false</b> if not.
      */
-    private boolean instantiatePreprocessor(String className, boolean reuseInstance) {
-        if(className == null)
+    private boolean instantiatePreprocessor( String className, boolean reuseInstance )
+    {
+        if ( className == null )
             return false;
 
-        try {
-            Object object = Class.forName(className).newInstance();
-            if(object instanceof PreProcessible)
+        try
+        {
+            Object object = Class.forName( className ).newInstance();
+            if ( object instanceof PreProcessible )
             {
-                setPreprocessor((PreProcessible) object, reuseInstance);
+                setPreprocessor( ( PreProcessible ) object, reuseInstance );
                 return true;
-            }
-            else
-                XltLogger.runTimeLogger.warn("Class '" + className + "' is not of type 'com.xceptance.xrt.PreProcessible'. " +
-                        "Ignoring global property.");
+            } else
+                XltLogger.runTimeLogger.warn( "Class '" + className + "' is not of type 'com.xceptance.xrt.PreProcessible'. " +
+                        "Ignoring global property." );
 
-        } catch (InstantiationException | IllegalAccessException e) {
-            XltLogger.runTimeLogger.warn("Could not instantiate class: '" + className + "'. Please check if there's a " +
-                    "public no-args constructor. Ignoring global property.");
-        } catch (ClassNotFoundException e) {
-            XltLogger.runTimeLogger.warn("Could not find class in classpath: '" + className + "'. Ignoring global property.");
+        } catch ( InstantiationException | IllegalAccessException e )
+        {
+            XltLogger.runTimeLogger.warn( "Could not instantiate class: '" + className + "'. Please check if there's a " +
+                    "public no-args constructor. Ignoring global property." );
+        } catch ( ClassNotFoundException e )
+        {
+            XltLogger.runTimeLogger.warn( "Could not find class in classpath: '" + className + "'. Ignoring global property." );
         }
 
         return false;
     }
 
     /**
-     * Reads the Url settings from the resource definition class and applies
-     * them.
+     * Reads the Url settings from the resource definition class and applies them.
      *
      * @param resourceDef
-     *            A class that has the annotation {@link ResourceDefinition}.
+     *         A class that has the annotation {@link ResourceDefinition}.
      */
     private void readResourceDefinition( final Class<?> resourceDef )
     {
@@ -1801,11 +1795,10 @@ public class RESTCall
     }
 
     /**
-     * Reads the HTTP method settings from the resource definition class and
-     * applies them.
+     * Reads the HTTP method settings from the resource definition class and applies them.
      *
      * @param resourceDef
-     *            A class that has the annotation {@link HttpMethodDefinition}.
+     *         A class that has the annotation {@link HttpMethodDefinition}.
      */
     private void readHttpMethodDefinition( final Class<?> resourceDef )
     {
@@ -1819,11 +1812,10 @@ public class RESTCall
     }
 
     /**
-     * Reads the HTTP header settings from the resource definition class and
-     * applies them.
+     * Reads the HTTP header settings from the resource definition class and applies them.
      *
      * @param resourceDef
-     *            A class that has the annotation {@link HttpHeaderDefinition}.
+     *         A class that has the annotation {@link HttpHeaderDefinition}.
      */
     private void readHttpHeaderDefinition( final Class<?> resourceDef )
     {
@@ -1842,11 +1834,10 @@ public class RESTCall
     }
 
     /**
-     * Reads the placeholder settings from the resource definition class and
-     * applies them.
+     * Reads the placeholder settings from the resource definition class and applies them.
      *
      * @param resourceDef
-     *            A class that has the annotation {@link PlaceholderDefinition}.
+     *         A class that has the annotation {@link PlaceholderDefinition}.
      */
     private void readPlaceholderDefinition( final Class<?> resourceDef )
     {
@@ -1869,24 +1860,24 @@ public class RESTCall
      * {@link PreProcessible} directly takes precedence before the annotation {@link PreProcess}.
      *
      * @param resourceDef
-     *              A class that has the annotation {@link PreProcess}.
+     *         A class that has the annotation {@link PreProcess}.
      */
     private void readPreprocessorDefinition( final Class<?> resourceDef )
     {
         // Read implemented method first
-        if( instantiatePreprocessor( resourceDef.getName(), false ) )
+        if ( instantiatePreprocessor( resourceDef.getName(), false ) )
             return;
 
         PreProcess def = resourceDef.getAnnotation( PreProcess.class );
 
         // If there is no annotation stop processing.
-        if( def == null )
+        if ( def == null )
             return;
 
         // Check if the class already got defined via annotation
-        if( def.reuseInstance()
+        if ( def.reuseInstance()
                 && preprocessorReuse.get() != null
-                && preprocessorReuse.get().getClass().getName().equals( def.value().getName() ))
+                && preprocessorReuse.get().getClass().getName().equals( def.value().getName() ) )
             return;
 
         // Try to instantiate the pre-processor
@@ -1894,15 +1885,30 @@ public class RESTCall
     }
 
     /**
-     * Determines if a resource definition class was derived from
-     * {@link DisableDefaultValidation}, creates an instance of the class, and
-     * stores it in a list for a later usage of the validators.
-     *
-     * @param <T>
-     *            The type of the resource definition class.
+     * Reads the basic authentication settings.
      *
      * @param resourceDef
-     *            A class that has default validation methods.
+     *         A class that has the annotation {@link BasicAuth}.
+     */
+    private void readBasicAuthDefinition( final Class<?> resourceDef )
+    {
+        BasicAuth def = resourceDef.getAnnotation( BasicAuth.class );
+
+        // If there is no annotation stop processing
+        if ( def == null )
+            return;
+
+        basicAuthCredentials = new BasicAuthCredentials( def.username(), def.password() );
+    }
+
+    /**
+     * Determines if a resource definition class was derived from {@link DisableDefaultValidation}, creates an instance
+     * of the class, and stores it in a list for a later usage of the validators.
+     *
+     * @param <T>
+     *         The type of the resource definition class.
+     * @param resourceDef
+     *         A class that has default validation methods.
      */
     private <T> void readValidator( final Class<T> resourceDef )
     {
@@ -1917,9 +1923,8 @@ public class RESTCall
             try
             {
                 constr = resourceDef.getConstructor();
-                defaultValidators.add( (AutoValidatable) constr.newInstance() );
-            }
-            catch ( NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+                defaultValidators.add( ( AutoValidatable ) constr.newInstance() );
+            } catch ( NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
                     | IllegalArgumentException | InvocationTargetException e )
             {
                 XltLogger.runTimeLogger.error( "Default validation failed!\n" + e.toString() );
@@ -1931,7 +1936,7 @@ public class RESTCall
      * Removes a validator from the internal list.
      *
      * @param resourceDef
-     *            A class that has default validation methods.
+     *         A class that has default validation methods.
      */
     private void removeValidator( final Class<?> resourceDef )
     {
@@ -1946,9 +1951,8 @@ public class RESTCall
     }
 
     /**
-     * Some response data is processed in validators and is therefore requested
-     * several times after a REST call. The caches reduce the memory consumption
-     * and calculation time. When the same RESTCall instance is used again the
+     * Some response data is processed in validators and is therefore requested several times after a REST call. The
+     * caches reduce the memory consumption and calculation time. When the same RESTCall instance is used again the
      * cached response data needs to be cleared.
      */
     private void clearResponseCaches()
@@ -1960,8 +1964,7 @@ public class RESTCall
     }
 
     /**
-     * Performs the default validation by looping through the list of
-     * validators.
+     * Performs the default validation by looping through the list of validators.
      */
     private void processValidators()
     {
@@ -1975,12 +1978,10 @@ public class RESTCall
     }
 
     /**
-     * Splits the Url into its individual elements, e.g. host name, port, query
-     * parameters, ...
+     * Splits the Url into its individual elements, e.g. host name, port, query parameters, ...
      *
      * @param url
-     *            The url that needs to be processes. Should already be Url
-     *            encoded.
+     *         The url that needs to be processes. Should already be Url encoded.
      */
     private void splitUrl( final String url )
     {
@@ -2002,6 +2003,27 @@ public class RESTCall
         // Check if the rest of the Url is empty.
         if ( restUrl.isEmpty() )
             return;
+
+        // Check if there are basic authentication credentials
+        index = restUrl.indexOf( "@" );
+        if ( index != -1 )
+        {
+            if ( index > 0 )
+            {
+                String credentials = restUrl.substring( 0, index );
+
+                // find the credentials separator
+                int sepIndex = credentials.indexOf( ":" );
+                // no separator => only username
+                if ( sepIndex == -1 )
+                    basicAuthCredentials = new BasicAuthCredentials( credentials, null );
+                else
+                    basicAuthCredentials = new BasicAuthCredentials( credentials.substring( 0, sepIndex ),
+                            credentials.substring( sepIndex + 1 ) );
+            }
+
+            restUrl = restUrl.substring( index + 1 );
+        }
 
         // Remove multiple separators that are not allowed.
         restUrl = removeMultipleSlashes( restUrl );
@@ -2046,8 +2068,7 @@ public class RESTCall
         {
             hostAndPort = restUrl.substring( 0, index );
             restUrl = restUrl.substring( index + 1 );
-        }
-        else
+        } else
         {
             // Only the host name was provided.
             hostAndPort = restUrl;
@@ -2066,8 +2087,7 @@ public class RESTCall
             // Check if there is a port and if it's a numerical value.
             if ( portStr.length() > 0 && portStr.matches( "^[0-9]+$" ) )
                 this.port = new Integer( portStr );
-        }
-        else
+        } else
             this.hostName = hostAndPort;
 
         // Check if the rest of the Url is empty.
@@ -2102,7 +2122,7 @@ public class RESTCall
      * Removes multiple slashes from an Url without protocol.
      *
      * @param url
-     *            The Url that contains multiple slashes.
+     *         The Url that contains multiple slashes.
      *
      * @return An Url that only has single slashes.
      */
@@ -2117,11 +2137,10 @@ public class RESTCall
     }
 
     /**
-     * Removes multiple fragment separators ( '#' ) from an Url without
-     * protocol.
+     * Removes multiple fragment separators ( '#' ) from an Url without protocol.
      *
      * @param url
-     *            The Url that contains multiple fragment separators.
+     *         The Url that contains multiple fragment separators.
      *
      * @return An Url that only has single fragment separator.
      */
@@ -2136,11 +2155,10 @@ public class RESTCall
     }
 
     /**
-     * Removes multiple query param separators ( '#' ) from an Url without
-     * protocol.
+     * Removes multiple query param separators ( '#' ) from an Url without protocol.
      *
      * @param url
-     *            The Url that contains multiple query param separators.
+     *         The Url that contains multiple query param separators.
      *
      * @return An Url that only has single query param separator.
      */
@@ -2155,12 +2173,10 @@ public class RESTCall
     }
 
     /**
-     * Splits the query string of an Url into its individual parameters and adds
-     * them to the query parameter map.
+     * Splits the query string of an Url into its individual parameters and adds them to the query parameter map.
      *
      * @param queryString
-     *            The part of the Url after '?' and before '#'. Should already
-     *            be Url encoded.
+     *         The part of the Url after '?' and before '#'. Should already be Url encoded.
      */
     private void splitQueryString( final String queryString )
     {
@@ -2180,12 +2196,11 @@ public class RESTCall
     }
 
     /**
-     * All Url path segments like {@link #basePath} or {@link #resourcePath} are
-     * saved without leading and trailing slashes. Also double slashes should be
-     * replaced by single ones.
+     * All Url path segments like {@link #basePath} or {@link #resourcePath} are saved without leading and trailing
+     * slashes. Also double slashes should be replaced by single ones.
      *
      * @param urlPathSegment
-     *            A part of the url path.
+     *         A part of the url path.
      *
      * @return The sanitized Url path segment.
      */
@@ -2209,8 +2224,7 @@ public class RESTCall
      * Replaces all placeholders with the given key-value map.
      *
      * @param content
-     *            The content that contains placeholders that need to be
-     *            replaced.
+     *         The content that contains placeholders that need to be replaced.
      *
      * @return The content with the replaced placeholders.
      */
@@ -2227,15 +2241,14 @@ public class RESTCall
     }
 
     /**
-     * Is used in all methods that return response information and throws a
-     * {@link RESTCallNotYetPerformedException} if the REST call was not yet
-     * performed and response information cannot be returned.
+     * Is used in all methods that return response information and throws a {@link RESTCallNotYetPerformedException} if
+     * the REST call was not yet performed and response information cannot be returned.
      *
      * @param methodName
-     *            The name of the method where this method is used. Class path
-     *            information is added automatically.
+     *         The name of the method where this method is used. Class path information is added automatically.
+     *
      * @throws RESTCallNotYetPerformedException
-     *             Unchecked exception.
+     *         Unchecked exception.
      */
     private void checkRESTCallPerformed( String methodName )
     {

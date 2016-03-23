@@ -1,19 +1,14 @@
 package com.xceptance.xrt;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.xceptance.xrt.annotation.*;
+import com.xceptance.xrt.annotation.authentication.BasicAuth;
+import com.xceptance.xrt.authentication.BasicAuthCredentials;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.xceptance.xrt.annotation.HttpHeader;
-import com.xceptance.xrt.annotation.HttpHeaderDefinition;
-import com.xceptance.xrt.annotation.HttpMethodDefinition;
-import com.xceptance.xrt.annotation.Placeholder;
-import com.xceptance.xrt.annotation.PlaceholderDefinition;
-import com.xceptance.xrt.annotation.QueryParameter;
-import com.xceptance.xrt.annotation.ResourceDefinition;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -290,5 +285,39 @@ public class TestRESTCallDefinitionSetup
         expectedMap.put( "x-custom", "true" );
 
         Assert.assertEquals( "Expected Http Headers: ", expectedMap, call.getHttpHeaders() );
+    }
+
+    @Test
+    public void basicAuthDefinition()
+    {
+        // Define the resource definition
+        @BasicAuth( username = "user1", password = "pwd")
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall( "www.xrt.com").setDefinitionClass( DefinitionClass.class );
+        BasicAuthCredentials credentials = call.getBasicAuthCredentials();
+
+        Assert.assertEquals( "user1", credentials.getUsername() );
+        Assert.assertEquals( "pwd", credentials.getPassword() );
+        Assert.assertEquals( "http://user1:pwd@www.xrt.com", call.getUrl() );
+    }
+
+    @Test
+    public void basicAuthDefinition_noPwd()
+    {
+        // Define the resource definition
+        @BasicAuth( username = "user1")
+        class DefinitionClass
+        {
+        }
+
+        RESTCall call = new RESTCall( "www.xrt.com").setDefinitionClass( DefinitionClass.class );
+        BasicAuthCredentials credentials = call.getBasicAuthCredentials();
+
+        Assert.assertEquals( "user1", credentials.getUsername() );
+        Assert.assertEquals( "", credentials.getPassword() );
+        Assert.assertEquals( "http://user1@www.xrt.com", call.getUrl() );
     }
 }

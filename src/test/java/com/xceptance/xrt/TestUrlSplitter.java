@@ -260,4 +260,30 @@ public class TestUrlSplitter
 
         Assert.assertEquals( "Expected Url: ", "http://my.url.test.com/resource?q=search#fragment", call.getUrl() );
     }
+
+    @Test
+    public void splitUrl_BasicAuthCredentials()
+    {
+        RESTCall call = new RESTCall( "http://user:password@localhost:8080/testpages/auth/basic/" );
+
+        Assert.assertEquals( "Expected Url: ", "http://user:password@localhost:8080/testpages/auth/basic", call.getUrl() );
+        Assert.assertEquals( "Expected username: ", "user", call.getBasicAuthCredentials().getUsername() );
+        Assert.assertEquals( "Expected password: ", "password", call.getBasicAuthCredentials().getPassword() );
+    }
+
+    @Test
+    public void splitUrl_BasicAuthCredentials_NoPWD()
+    {
+        RESTCall call = new RESTCall( "http://user@localhost:8080/testpages/auth/basic/" );
+
+        Assert.assertEquals( "Expected Url: ", "http://user@localhost:8080/testpages/auth/basic", call.getUrl() );
+    }
+
+    @Test
+    public void splitUrl_BasicAuthCredentials_NoCredentials()
+    {
+        RESTCall call = new RESTCall( "http://@localhost:8080/testpages/auth/basic/" );
+
+        Assert.assertEquals( "Expected Url: ", "http://localhost:8080/testpages/auth/basic", call.getUrl() );
+    }
 }
