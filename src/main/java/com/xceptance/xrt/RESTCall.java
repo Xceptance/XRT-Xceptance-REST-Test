@@ -1626,13 +1626,6 @@ public class RESTCall
             instantiatePreprocessor( preProcessorClassName, reusePreprocessor );
         }
 
-        // Read basic authentication credentials
-        String username = globSettings.getProperty( "com.xceptance.xrt.authentication.basic.username" );
-        String password = globSettings.getProperty( "com.xceptance.xrt.authentication.basic.password" );
-
-        if ( username != null )
-            basicAuthCredentials = new BasicAuthCredentials( username, password );
-
         // Read settings that contain a list of key-value pairs.
         readGlobalListProperty( "com.xceptance.xrt.queryParams", this.queryParams );
         readGlobalMultiSingleProperties( "com.xceptance.xrt.queryParam.", this.queryParams );
