@@ -3,7 +3,10 @@ package com.xceptance.xrt;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.xceptance.xlt.api.actions.AbstractLightWeightPageAction;
+import com.xceptance.xlt.api.htmlunit.LightWeightPage;
 import com.xceptance.xlt.api.util.XltLogger;
+import com.xceptance.xlt.engine.LightWeightPageImpl;
+import com.xceptance.xlt.engine.XltWebClient;
 
 import java.net.URL;
 
@@ -18,7 +21,7 @@ public class XltRESTAction extends AbstractLightWeightPageAction
     /**
      * The settings for the REST call.
      */
-    private final RESTCall restCall;
+    protected final RESTCall restCall;
 
     /**
      * Constructor with minimum settings.
@@ -85,9 +88,11 @@ public class XltRESTAction extends AbstractLightWeightPageAction
         WebResponse response = getWebClient().loadWebResponse( request );
         restCall.setRESTResponse( response );
         restCall.setPreviousAction( this );
+        
+        // Provide timer name to set the resulting page (in results browser)
+        setLightWeightPage(new LightWeightPageImpl(response, getTimerName(), (XltWebClient)getWebClient()));
 
-        // DEBUGGING - log response code, response HTTP headers, and response
-        // body
+        // DEBUGGING - log response code, response HTTP headers, and response body
         XltLogger.runTimeLogger.debug( "Getting response..." );
         XltLogger.runTimeLogger.debug( "# Response - Status code:\t" + response.getStatusCode() );
         XltLogger.runTimeLogger.debug( "# Response - HTTP header:\t" + response.getResponseHeaders().toString() );
@@ -103,6 +108,5 @@ public class XltRESTAction extends AbstractLightWeightPageAction
     protected void postValidate() throws Exception
     {
         // Nothing to post-validate
-
     }
 }
