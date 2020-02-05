@@ -1,5 +1,9 @@
 # Xceptance REST Test (XRT)
 
+## Deprecation Notice
+This project has been retired. A new and cleaner as well as more performant approach can be found here: https://github.com/Xceptance/rest-load-test-suite
+
+## What is XRT?
 XRT is a REST API testing tool based on Xceptance Load Test (XLT). It can be used for functional tests as well as for load testing REST APIs. 
  
 XRT ships without UI. All tests are implemented in Java as JUnit tests. This allows a good integration into any CI process.
